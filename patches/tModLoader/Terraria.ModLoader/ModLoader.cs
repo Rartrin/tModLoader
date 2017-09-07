@@ -27,7 +27,7 @@ namespace Terraria.ModLoader
 	{
 		//change Terraria.Main.DrawMenu change drawn version number string to include this
 		/// <summary>The name and version number of tModLoader.</summary>
-		public static readonly Version version = new Version(0, 10, 0, 3);
+		public static readonly Version version = new Version(0, 10, 1);
 		public static readonly string versionedName = "tModLoader v" + version;
 #if WINDOWS
 		public static readonly bool windows = true;
@@ -68,8 +68,10 @@ namespace Terraria.ModLoader
 		internal static readonly IDictionary<string, ModHotKey> modHotKeys = new Dictionary<string, ModHotKey>();
 		internal static readonly string modBrowserPublicKey = "<RSAKeyValue><Modulus>oCZObovrqLjlgTXY/BKy72dRZhoaA6nWRSGuA+aAIzlvtcxkBK5uKev3DZzIj0X51dE/qgRS3OHkcrukqvrdKdsuluu0JmQXCv+m7sDYjPQ0E6rN4nYQhgfRn2kfSvKYWGefp+kqmMF9xoAq666YNGVoERPm3j99vA+6EIwKaeqLB24MrNMO/TIf9ysb0SSxoV8pC/5P/N6ViIOk3adSnrgGbXnFkNQwD0qsgOWDks8jbYyrxUFMc4rFmZ8lZKhikVR+AisQtPGUs3ruVh4EWbiZGM2NOkhOCOM4k1hsdBOyX2gUliD0yjK5tiU3LBqkxoi2t342hWAkNNb4ZxLotw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 		internal static string modBrowserPassphrase = "";
+		internal static bool isModder;
 		internal static bool dontRemindModBrowserUpdateReload;
 		internal static bool dontRemindModBrowserDownloadEnable;
+		internal static byte musicStreamMode;
 		internal static string commandLineModPack = "";
 		private static string steamID64 = "";
 		internal static string SteamID64
@@ -665,6 +667,7 @@ namespace Terraria.ModLoader
 			MountLoader.Unload();
 			ModGore.Unload();
 			SoundLoader.Unload();
+			DisposeMusic();
 			BackgroundTextureLoader.Unload();
 			UgBgStyleLoader.Unload();
 			SurfaceBgStyleLoader.Unload();
@@ -726,15 +729,37 @@ namespace Terraria.ModLoader
 				Main.chest[i] = new Chest();
 			}
 
-#if DEBUG
 			// TODO: Display this warning to modders
 			GC.Collect();
-			foreach (var weakReference in loadedModsWeakReferences)
+			if (ModLoader.isModder)
 			{
-				if (weakReference.IsAlive)
-					ErrorLogger.Log((weakReference.Target as Mod).Name + " not fully unloaded during unload.");
+				foreach (var weakReference in loadedModsWeakReferences)
+				{
+					if (weakReference.IsAlive)
+						ErrorLogger.Log((weakReference.Target as Mod).Name + " not fully unloaded during unload.");
+				}
 			}
-#endif
+		}
+
+		private static void DisposeMusic()
+		{
+			for (int i = 0; i < Main.music.Length; i++)
+			{
+				MusicStreaming music = Main.music[i] as MusicStreaming;
+				if (music != null)
+				{
+					if (i < Main.maxMusic)
+					{
+						Main.music[i] = Main.soundBank.GetCue("Music_" + i);
+					}
+					else
+					{
+						Main.music[i] = null;
+					}
+					music.Stop(AudioStopOptions.Immediate);
+					music.Dispose();
+				}
+			}
 		}
 
 		internal static void Reload()
@@ -997,6 +1022,7 @@ namespace Terraria.ModLoader
 			Main.Configuration.Put("OnlyDownloadSignedModsFromServers", ModNet.onlyDownloadSignedMods);
 			Main.Configuration.Put("DontRemindModBrowserUpdateReload", ModLoader.dontRemindModBrowserUpdateReload);
 			Main.Configuration.Put("DontRemindModBrowserDownloadEnable", ModLoader.dontRemindModBrowserDownloadEnable);
+			Main.Configuration.Put("MusicStreamMode", ModLoader.musicStreamMode);
 		}
 
 		internal static void LoadConfiguration()
@@ -1007,6 +1033,7 @@ namespace Terraria.ModLoader
 			Main.Configuration.Get<bool>("OnlyDownloadSignedModsFromServers", ref ModNet.onlyDownloadSignedMods);
 			Main.Configuration.Get<bool>("DontRemindModBrowserUpdateReload", ref ModLoader.dontRemindModBrowserUpdateReload);
 			Main.Configuration.Get<bool>("DontRemindModBrowserDownloadEnable", ref ModLoader.dontRemindModBrowserDownloadEnable);
+			Main.Configuration.Get<byte>("MusicStreamMode", ref ModLoader.musicStreamMode);
 		}
 
 		/// <summary>

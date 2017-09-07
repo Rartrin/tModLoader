@@ -59,7 +59,7 @@ namespace Terraria.ModLoader
 		internal bool loading;
 		internal readonly IDictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 		internal readonly IDictionary<string, SoundEffect> sounds = new Dictionary<string, SoundEffect>();
-		internal readonly IDictionary<string, Music> musics = new Dictionary<string, Music>();
+		internal readonly IDictionary<string, MusicData> musics = new Dictionary<string, MusicData>();
 		internal readonly IDictionary<string, DynamicSpriteFont> fonts = new Dictionary<string, DynamicSpriteFont>();
 		internal readonly IDictionary<string, Effect> effects = new Dictionary<string, Effect>();
 		internal readonly IList<ModRecipe> recipes = new List<ModRecipe>();
@@ -166,7 +166,7 @@ namespace Terraria.ModLoader
 								{
 									if (soundPath.StartsWith("Sounds/Music/"))
 									{
-										musics[soundPath] = new MusicStreamingWAV(new MemoryStream(data));
+										musics[soundPath] = new MusicData(data, false);
 									}
 									else
 									{
@@ -187,18 +187,18 @@ namespace Terraria.ModLoader
 							{
 								if (mp3Path.StartsWith("Sounds/Music/"))
 								{
-									bool useCache = true; // TODO: Make this a setting.
+									bool useCache = ModLoader.musicStreamMode == 1;
 									if (useCache)
 									{
 										if (!WAVCacheIO.WAVCacheAvailable(wavCacheFilename))
 										{
 											WAVCacheIO.CacheMP3(wavCacheFilename, data);
 										}
-										musics[mp3Path] = new MusicStreamingWAV(WAVCacheIO.ModCachePath + Path.DirectorySeparatorChar + wavCacheFilename);
+										musics[mp3Path] = new MusicData(WAVCacheIO.ModCachePath + Path.DirectorySeparatorChar + wavCacheFilename);
 									}
 									else
 									{
-										musics[mp3Path] = new MusicStreamingMP3(data);
+										musics[mp3Path] = new MusicData(data, true);
 									}
 								}
 								else
@@ -2199,19 +2199,13 @@ namespace Terraria.ModLoader
 			waterfallStyles.Clear();
 			globalRecipes.Clear();
 			translations.Clear();
-			// Manually Dispose IDisposables to free up unmanaged memory immediately
 			if (!Main.dedServ)
 			{
+				// Manually Dispose IDisposables to free up unmanaged memory immediately
+				/* Skip this for now, too many mods don't unload properly and run into exceptions.
 				foreach (var sound in sounds)
 				{
 					sound.Value.Dispose();
-				}
-				foreach (var music in musics)
-				{
-					music.Value.Stop(AudioStopOptions.Immediate);
-					MusicStreaming musicValue = music.Value as MusicStreaming;
-					if (musicValue != null)
-						musicValue.Dispose();
 				}
 				foreach (var effect in effects)
 				{
@@ -2221,7 +2215,13 @@ namespace Terraria.ModLoader
 				{
 					texture.Value.Dispose();
 				}
+				*/
 			}
+			sounds.Clear();
+			effects.Clear();
+			textures.Clear();
+			musics.Clear();
+			fonts.Clear();
 		}
 
 		/// <summary>
@@ -2314,12 +2314,12 @@ namespace Terraria.ModLoader
 		/// <exception cref="Terraria.ModLoader.Exceptions.MissingResourceException"></exception>
 		public Music GetMusic(string name)
 		{
-			Music sound;
+			MusicData sound;
 			if (!musics.TryGetValue(name, out sound))
 			{
 				throw new MissingResourceException(name);
 			}
-			return sound;
+			return sound.GetInstance();
 		}
 
 		/// <summary>

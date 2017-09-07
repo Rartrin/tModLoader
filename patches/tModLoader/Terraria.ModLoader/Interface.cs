@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using Terraria.ModLoader.UI;
 
@@ -52,7 +53,7 @@ namespace Terraria.ModLoader
 		//Interface.AddMenuButtons(this, this.selectedMenu, array9, array7, ref num, ref num3, ref num10, ref num5);
 		internal static void AddMenuButtons(Main main, int selectedMenu, string[] buttonNames, float[] buttonScales, ref int offY, ref int spacing, ref int buttonIndex, ref int numButtons)
 		{
-			buttonNames[buttonIndex] = "Mods";
+			buttonNames[buttonIndex] = Language.GetTextValue("tModLoader.MenuMods");
 			if (selectedMenu == buttonIndex)
 			{
 				Main.PlaySound(10, -1, -1, 1);
@@ -60,7 +61,7 @@ namespace Terraria.ModLoader
 			}
 			buttonIndex++;
 			numButtons++;
-			buttonNames[buttonIndex] = "Mod Sources";
+			buttonNames[buttonIndex] = Language.GetTextValue("tModLoader.MenuModSources");
 			if (selectedMenu == buttonIndex)
 			{
 				Main.PlaySound(10, -1, -1, 1);
@@ -68,7 +69,7 @@ namespace Terraria.ModLoader
 			}
 			buttonIndex++;
 			numButtons++;
-			buttonNames[buttonIndex] = "Mod Browser (Beta)";
+			buttonNames[buttonIndex] = Language.GetTextValue("tModLoader.MenuModBrowser");
 			if (selectedMenu == buttonIndex)
 			{
 				Main.PlaySound(10, -1, -1, 1);
@@ -218,23 +219,24 @@ namespace Terraria.ModLoader
 			{
 				Main.MenuUI.SetState(modPacksMenu);
 				Main.menuMode = 888;
-			} 
-			else if (Main.menuMode == extractModID) {
+			}
+			else if (Main.menuMode == extractModID)
+			{
 				Main.MenuUI.SetState(extractMod);
 				Main.menuMode = 888;
-			} 
+			}
 			else if (Main.menuMode == tModLoaderSettingsID)
 			{
 				offY = 210;
 				spacing = 42;
-				numButtons = 5;
+				numButtons = 6;
 				buttonVerticalSpacing[numButtons - 1] = 18;
 				for (int i = 0; i < numButtons; i++)
 				{
 					buttonScales[i] = 0.75f;
 				}
 				int buttonIndex = 0;
-				buttonNames[buttonIndex] = (ModNet.downloadModsFromServers ? "Download Mods From Servers: On" : "Download Mods From Servers: Off");
+				buttonNames[buttonIndex] = (ModNet.downloadModsFromServers ? Language.GetTextValue("tModLoader.DownloadFromServersYes") : Language.GetTextValue("tModLoader.DownloadFromServersNo"));
 				if (selectedMenu == buttonIndex)
 				{
 					Main.PlaySound(SoundID.MenuTick);
@@ -242,7 +244,7 @@ namespace Terraria.ModLoader
 				}
 
 				buttonIndex++;
-				buttonNames[buttonIndex] = (ModNet.onlyDownloadSignedMods ? "Only Download Signed Mods From Servers: On" : "Only Download Signed Mods From Servers: Off");
+				buttonNames[buttonIndex] = (ModNet.onlyDownloadSignedMods ? Language.GetTextValue("tModLoader.DownloadSignedYes") : Language.GetTextValue("tModLoader.DownloadSignedNo"));
 				if (selectedMenu == buttonIndex)
 				{
 					Main.PlaySound(SoundID.MenuTick);
@@ -250,7 +252,15 @@ namespace Terraria.ModLoader
 				}
 
 				buttonIndex++;
-				buttonNames[buttonIndex] = (Main.UseExperimentalFeatures ? "Experimental Features: On" : "Experimental Features: Off");
+				buttonNames[buttonIndex] = (ModLoader.musicStreamMode == 0 ? Language.GetTextValue("tModLoader.MusicStreamModeConvert") : Language.GetTextValue("tModLoader.MusicStreamModeStream"));
+				if (selectedMenu == buttonIndex)
+				{
+					Main.PlaySound(SoundID.MenuTick);
+					ModLoader.musicStreamMode = (byte)((ModLoader.musicStreamMode + 1) % 2);
+				}
+
+				buttonIndex++;
+				buttonNames[buttonIndex] = (Main.UseExperimentalFeatures ? Language.GetTextValue("tModLoader.ExperimentalFeaturesYes") : Language.GetTextValue("tModLoader.ExperimentalFeaturesNo"));
 				if (selectedMenu == buttonIndex)
 				{
 					Main.PlaySound(SoundID.MenuTick);
@@ -258,7 +268,7 @@ namespace Terraria.ModLoader
 				}
 
 				buttonIndex++;
-				buttonNames[buttonIndex] = "Clear Mod Browser Credentials";
+				buttonNames[buttonIndex] = Language.GetTextValue("tModLoader.ClearMBCredentials");
 				if (selectedMenu == buttonIndex)
 				{
 					Main.PlaySound(SoundID.MenuTick);
@@ -294,7 +304,7 @@ namespace Terraria.ModLoader
 					line += (ModLoader.IsEnabled(mods[k]) ? "enabled" : "disabled") + ")";
 					Console.WriteLine(line);
 				}
-				if(mods.Length == 0)
+				if (mods.Length == 0)
 				{
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.WriteLine($"No mods were found in: \"{ModLoader.ModPath}\"\nIf you are running a dedicated server, you may wish to use the 'modpath' command line switch or server config setting to specify a custom mods directory.\n");
