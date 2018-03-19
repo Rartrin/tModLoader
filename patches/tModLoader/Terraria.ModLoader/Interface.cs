@@ -32,6 +32,7 @@ namespace Terraria.ModLoader
 		internal const int enterSteamIDMenuID = 10018;
 		internal const int extractModID = 10019;
 		internal const int downloadModsID = 10020;
+		internal const int uploadModID = 10021;
 		internal static UIMods modsMenu = new UIMods();
 		internal static UILoadMods loadMods = new UILoadMods();
 		private static UIModSources modSources = new UIModSources();
@@ -49,6 +50,7 @@ namespace Terraria.ModLoader
 		internal static UIEnterSteamIDMenu enterSteamIDMenu = new UIEnterSteamIDMenu();
 		internal static UIExtractMod extractMod = new UIExtractMod();
 		internal static UIDownloadMods downloadMods = new UIDownloadMods();
+		internal static UIUploadMod uploadMod = new UIUploadMod();
 		//add to Terraria.Main.DrawMenu in Main.menuMode == 0 after achievements
 		//Interface.AddMenuButtons(this, this.selectedMenu, array9, array7, ref num, ref num3, ref num10, ref num5);
 		internal static void AddMenuButtons(Main main, int selectedMenu, string[] buttonNames, float[] buttonScales, ref int offY, ref int spacing, ref int buttonIndex, ref int numButtons)
@@ -91,14 +93,16 @@ namespace Terraria.ModLoader
 			modBrowser.sortMode = ModBrowserSortMode.RecentlyUpdated;
 			modBrowser.updateFilterMode = UpdateFilter.Available;
 			modBrowser.searchFilterMode = SearchFilter.Name;
-			modBrowser.SearchFilterToggle?.setCurrentState(0);
-			if (modBrowser._categoryButtons.Count == 2)
+			modBrowser.modSideFilterMode = ModSideFilter.All;
+			modBrowser.SearchFilterToggle?.setCurrentState((int)modBrowser.searchFilterMode);
+			if (modBrowser._categoryButtons.Count == 3)
 			{
-				modBrowser._categoryButtons[0].setCurrentState(4);
-				modBrowser._categoryButtons[1].setCurrentState(1);
+				modBrowser._categoryButtons[0].setCurrentState((int)modBrowser.sortMode);
+				modBrowser._categoryButtons[1].setCurrentState((int)modBrowser.updateFilterMode);
+				modBrowser._categoryButtons[2].setCurrentState((int)modBrowser.modSideFilterMode);
 			}
 			modBrowser.loading = false;
-			ModLoader.findModsCache.Clear();
+			ModLoader.modsDirCache.Clear();
 			GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 		}
 
@@ -225,11 +229,16 @@ namespace Terraria.ModLoader
 				Main.MenuUI.SetState(extractMod);
 				Main.menuMode = 888;
 			}
+			else if (Main.menuMode == uploadModID)
+			{
+				Main.MenuUI.SetState(uploadMod);
+				Main.menuMode = 888;
+			}
 			else if (Main.menuMode == tModLoaderSettingsID)
 			{
 				offY = 210;
 				spacing = 42;
-				numButtons = 6;
+				numButtons = 7;
 				buttonVerticalSpacing[numButtons - 1] = 18;
 				for (int i = 0; i < numButtons; i++)
 				{
@@ -257,6 +266,14 @@ namespace Terraria.ModLoader
 				{
 					Main.PlaySound(SoundID.MenuTick);
 					ModLoader.musicStreamMode = (byte)((ModLoader.musicStreamMode + 1) % 2);
+				}
+
+				buttonIndex++;
+				buttonNames[buttonIndex] = (ModLoader.alwaysLogExceptions ? Language.GetTextValue("tModLoader.AlwaysLogExceptionsYes") : Language.GetTextValue("tModLoader.AlwaysLogExceptionsNo"));
+				if (selectedMenu == buttonIndex)
+				{
+					Main.PlaySound(SoundID.MenuTick);
+					ModLoader.alwaysLogExceptions = !ModLoader.alwaysLogExceptions;
 				}
 
 				buttonIndex++;
@@ -294,15 +311,11 @@ namespace Terraria.ModLoader
 			{
 				Console.WriteLine("Terraria Server " + Main.versionNumber2 + " - " + ModLoader.versionedName);
 				Console.WriteLine();
-				TmodFile[] mods = ModLoader.FindMods();
+				var mods = ModLoader.FindMods();
 				for (int k = 0; k < mods.Length; k++)
 				{
-					BuildProperties properties = BuildProperties.ReadModFile(mods[k]);
-					string name = properties.displayName;
-					name = mods[k].name;
-					string line = (k + 1) + "\t\t" + name + "(";
-					line += (ModLoader.IsEnabled(mods[k]) ? "enabled" : "disabled") + ")";
-					Console.WriteLine(line);
+					Console.Write((k + 1) + "\t\t" + mods[k].DisplayName);
+					Console.WriteLine(" (" + (ModLoader.IsEnabled(mods[k].Name) ? "enabled" : "disabled") + ")");
 				}
 				if (mods.Length == 0)
 				{
@@ -325,16 +338,16 @@ namespace Terraria.ModLoader
 				Console.Clear();
 				if (command == "e")
 				{
-					foreach (TmodFile mod in mods)
+					foreach (var mod in mods)
 					{
-						ModLoader.EnableMod(mod);
+						mod.Enabled = true;
 					}
 				}
 				else if (command == "d")
 				{
-					foreach (TmodFile mod in mods)
+					foreach (var mod in mods)
 					{
-						ModLoader.DisableMod(mod);
+						mod.Enabled = false;
 					}
 				}
 				else if (command == "r")
@@ -344,17 +357,9 @@ namespace Terraria.ModLoader
 					ModLoader.do_Load(null);
 					exit = true;
 				}
-				else
+				else if (int.TryParse(command, out int value) && value > 0 && value <= mods.Length)
 				{
-					int value;
-					if (Int32.TryParse(command, out value))
-					{
-						value--;
-						if (value >= 0 && value < mods.Length)
-						{
-							ModLoader.SetModActive(mods[value], !ModLoader.IsEnabled(mods[value]));
-						}
-					}
+					mods[value - 1].Enabled ^= true;
 				}
 			}
 		}

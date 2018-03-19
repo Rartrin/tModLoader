@@ -6,6 +6,7 @@ using Terraria.DataStructures;
 using Terraria.GameInput;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using Terraria.Graphics;
 using Terraria.Localization;
 using Terraria.UI;
 
@@ -17,6 +18,17 @@ namespace Terraria.ModLoader
 		/// Allows you to determine what music should currently play.
 		/// </summary>
 		/// <param name="music">The music.</param>
+		/// <param name="priority">The music priority.</param>
+		public virtual void UpdateMusic(ref int music, ref MusicPriority priority)
+		{
+			UpdateMusic(ref music);
+		}
+
+		/// <summary>
+		/// A legacy hook that you should no longer use. Use the version with two parameters instead.
+		/// </summary>
+		/// <param name="music"></param>
+		[Obsolete("This UpdateMusic method now obsolete, use the UpdateMusic with the MusicPriority parameter.")]
 		public virtual void UpdateMusic(ref int music)
 		{
 		}
@@ -61,13 +73,19 @@ namespace Terraria.ModLoader
 		/// <summary>
 		/// Allows you to set the transformation of the screen that is drawn. (Translations, rotations, scales, etc.)
 		/// </summary>
-		public virtual Matrix ModifyTransformMatrix(Matrix Transform)
+		public virtual void ModifyTransformMatrix(ref SpriteViewMatrix Transform)
 		{
-			return Transform;
 		}
 
 		/// <summary>
-		/// Allows you to modify the elements of the in-game interface that get drawn. MethodSequenceListItem can be found in the Terraria.DataStructures namespace. Check https://github.com/blushiemagic/tModLoader/wiki/Vanilla-Interface-layers-values for vanilla interface layer names
+		/// Ran every update and suitable for calling Update for UserInterface classes
+		/// </summary>
+		public virtual void UpdateUI(GameTime gameTime)
+		{
+		}
+
+		/// <summary>
+		/// Allows you to modify the elements of the in-game interface that get drawn. GameInterfaceLayer can be found in the Terraria.UI namespace. Check https://github.com/blushiemagic/tModLoader/wiki/Vanilla-Interface-layers-values for vanilla interface layer names
 		/// </summary>
 		/// <param name="layers">The layers.</param>
 		public virtual void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -127,11 +145,18 @@ namespace Terraria.ModLoader
 	internal static class ModHooks
 	{
 		//in Terraria.Main.UpdateMusic before updating music boxes call ModHooks.UpdateMusic(ref this.newMusic);
-		internal static void UpdateMusic(ref int music)
+		internal static void UpdateMusic(ref int music, ref MusicPriority priority)
 		{
 			foreach (Mod mod in ModLoader.mods.Values)
 			{
-				mod.UpdateMusic(ref music);
+				int modMusic = -1;
+				MusicPriority modPriority = MusicPriority.BiomeLow;
+				mod.UpdateMusic(ref modMusic, ref modPriority);
+				if (modMusic >= 0 && modPriority >= priority)
+				{
+					music = modMusic;
+					priority = modPriority;
+				}
 			}
 		}
 
@@ -147,13 +172,12 @@ namespace Terraria.ModLoader
 			}
 		}
 
-		internal static Matrix ModifyTransformMatrix(Matrix Transform)
+		internal static void ModifyTransformMatrix(ref SpriteViewMatrix Transform)
 		{
 			foreach (Mod mod in ModLoader.mods.Values)
 			{
-				Transform = mod.ModifyTransformMatrix(Transform);
+				mod.ModifyTransformMatrix(ref Transform);
 			}
-			return Transform;
 		}
 
 		internal static void ModifySunLight(ref Color tileColor, ref Color backgroundColor)
@@ -191,6 +215,15 @@ namespace Terraria.ModLoader
 			foreach (Mod mod in ModLoader.mods.Values)
 			{
 				mod.PostDrawFullscreenMap(ref mouseText);
+			}
+		}
+
+		internal static void UpdateUI(GameTime gameTime)
+		{
+			if (Main.gameMenu) return;
+			foreach (Mod mod in ModLoader.mods.Values)
+			{
+				mod.UpdateUI(gameTime);
 			}
 		}
 

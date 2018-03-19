@@ -174,7 +174,8 @@ namespace Terraria.ModLoader
 			{
 				Main.projHook[projectile.type] = true;
 			}
-			DisplayName.SetDefault(Regex.Replace(GetType().Name, "([A-Z])", " $1").Trim());
+			if (DisplayName.IsDefault())
+				DisplayName.SetDefault(Regex.Replace(Name, "([A-Z])", " $1").Trim());
 		}
 
 		/// <summary>
@@ -422,7 +423,7 @@ namespace Terraria.ModLoader
 		}
 
 		/// <summary>
-		/// Whether or not a grappling hook can only have one hook per player in the world at a time. Return null to use the vanilla code. Returns null by default.
+		/// Allows you to draw things in front of a projectile. This method is called even if PreDraw returns false.
 		/// </summary>
 		public virtual void PostDraw(SpriteBatch spriteBatch, Color lightColor)
 		{
