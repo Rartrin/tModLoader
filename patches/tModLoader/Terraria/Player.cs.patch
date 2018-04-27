@@ -98,14 +98,38 @@
  					Main.item[num3].newAndShiny = false;
  					if (Main.netMode == 1)
  					{
-@@ -1760,6 +_,7 @@
+@@ -1758,8 +_,17 @@
+ 					flag2 = true;
+ 				}
  				int num = Item.NewItem((int)this.position.X, (int)this.position.Y, this.width, this.height, this.inventory[this.selectedItem].type, 1, false, 0, false, false);
- 				if (!flag2 && this.inventory[this.selectedItem].type == 8 && this.inventory[this.selectedItem].stack > 1)
- 				{
-+					Main.item[num] = this.inventory[this.selectedItem].Clone();
+-				if (!flag2 && this.inventory[this.selectedItem].type == 8 && this.inventory[this.selectedItem].stack > 1)
+-				{
++				bool dryTorch = false;
++				bool wetTorch = false;
++				bool glowstick = false;
++				this.inventory[this.selectedItem].modItem?.AutoLightSelect(ref dryTorch, ref wetTorch, ref glowstick);
++				int type = this.inventory[this.selectedItem].type;
++				if (!flag2 && this.inventory[this.selectedItem].stack > 1 && (dryTorch || wetTorch || type == 8 || type == 427 || type == 428 || type == 429 || type == 430 || type == 431 || type == 432 || type == 433 || type == 523 || type == 974 || type == 1245 || type == 1333 || type == 2274 || type == 3004 || type == 3045 || type == 3114))
++				{
++					Item torch = this.inventory[this.selectedItem].Clone();
++					torch.stack = 1;
++					torch.position = Main.item[num].position;
++					Main.item[num] = torch;
  					this.inventory[this.selectedItem].stack--;
  				}
  				else
+@@ -1796,6 +_,11 @@
+ 					NetMessage.SendData(21, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+ 				}
+ 			}
++		}
++
++		public bool HasBuff(int type)
++		{
++			return FindBuffIndex(type) != -1;
+ 		}
+ 
+ 		public int FindBuffIndex(int type)
 @@ -1821,7 +_,7 @@
  				return;
  			}
@@ -326,10 +350,11 @@
  			if (Main.rand.Next(15) == 0 && Main.hardMode)
  			{
  				int number = Item.NewItem((int)this.position.X, (int)this.position.Y, this.width, this.height, 602, 1, false, 0, false, false);
-@@ -3363,6 +_,32 @@
+@@ -3363,6 +_,33 @@
  					}
  				}
  			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
 +		}
 +
 +		/// <summary>
@@ -379,8 +404,11 @@
  			if (num15 > 0)
  			{
  				NPC nPC = new NPC();
-@@ -3926,7 +_,7 @@
+@@ -3924,9 +_,10 @@
+ 					}
+ 				}
  			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
  		}
  
 -		private void TryGettingDevArmor()
@@ -400,6 +428,14 @@
  			int num = type - 2334;
  			if (type >= 3203)
  			{
+@@ -5040,6 +_,7 @@
+ 					}
+ 				}
+ 			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
+ 		}
+ 
+ 		public int CountItem(int type, int stopCountingAt = 0)
 @@ -5087,6 +_,11 @@
  
  		public void openLockBox()
@@ -412,7 +448,12 @@
  			bool flag = true;
  			while (flag)
  			{
-@@ -5221,6 +_,11 @@
+@@ -5217,10 +_,16 @@
+ 					}
+ 				}
+ 			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
+ 		}
  
  		public void openHerbBag()
  		{
@@ -424,7 +465,12 @@
  			int num = Main.rand.Next(2, 5);
  			if (Main.rand.Next(3) == 0)
  			{
-@@ -5300,6 +_,11 @@
+@@ -5296,10 +_,16 @@
+ 					NetMessage.SendData(21, -1, -1, null, number, 1f, 0f, 0f, 0, 0, 0);
+ 				}
+ 			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
+ 		}
  
  		public void openGoodieBag()
  		{
@@ -436,6 +482,14 @@
  			if (Main.rand.Next(150) == 0)
  			{
  				int number = Item.NewItem((int)this.position.X, (int)this.position.Y, this.width, this.height, 1810, 1, false, 0, false, false);
+@@ -5660,6 +_,7 @@
+ 					}
+ 				}
+ 			}
++			NPCLoader.blockLoot.Clear(); // clear blockloot
+ 		}
+ 
+ 		public void UpdateDyes(int plr)
 @@ -5721,47 +_,47 @@
  				int num = i % 10;
  				if (this.dye[num] != null && this.armor[i].type > 0 && this.armor[i].stack > 0 && (i / 10 >= 1 || !this.hideVisual[num] || this.armor[i].wingSlot > 0 || this.armor[i].type == 934))
@@ -2845,6 +2899,42 @@
  			int tileBoost = item.tileBoost;
  			int num3 = 0;
  			if (item.type == 1071 || item.type == 1543 || item.type == 1072 || item.type == 1544)
+@@ -13230,6 +_,7 @@
+ 			{
+ 				value.Y = Main.screenPosition.Y + (float)Main.screenHeight - (float)Main.mouseY;
+ 			}
++			//patch file: num, num2
+ 			int num = Player.tileTargetX;
+ 			int num2 = Player.tileTargetY;
+ 			if (num < 10)
+@@ -13270,6 +_,7 @@
+ 				flag = true;
+ 			}
+ 			IL_176:
++			TileLoader.DisableSmartInteract(Main.tile[num, num2], ref flag);
+ 			if (flag)
+ 			{
+ 				return;
+@@ -13480,7 +_,10 @@
+ 							list2.Add(new Tuple<int, int>(j, k));
+ 						}
+ 						IL_5D0:
+-						;
++						if (tile.active() && TileLoader.HasSmartInteract(tile.type))
++						{
++							list2.Add(new Tuple<int, int>(j, k));
++						}
+ 					}
+ 				}
+ 				if (list2.Count > 0)
+@@ -13769,6 +_,7 @@
+ 						num18 = 0;
+ 					}
+ 					IL_9F7:
++					TileLoader.FixSmartInteractCoords(type3, ref num13, ref num14, ref num15, ref num16, ref num17, ref num18);
+ 					if (num13 != 0 && num14 != 0)
+ 					{
+ 						int num19 = item3 - (int)tile2.frameX % (num15 * num13 + num17) / num15;
 @@ -14168,6 +_,7 @@
  			if (this.controlTorch && this.itemAnimation == 0)
  			{
@@ -3371,6 +3461,45 @@
  						{
  							float num3 = 12f;
  							Vector2 vector = new Vector2(Main.item[j].position.X + (float)(Main.item[j].width / 2), Main.item[j].position.Y + (float)(Main.item[j].height / 2));
+@@ -26430,6 +_,38 @@
+ 				{
+ 					this.inventory[num5] = array[num5].Clone();
+ 				}
++				return false;
++			}
++			return true;
++		}
++
++		public bool CanBuyItem(int price, int customCurrency = -1)
++		{
++			if (customCurrency != -1)
++			{
++				return CustomCurrencyManager.BuyItem(this, price, customCurrency);
++			}
++			bool flag;
++			long num = Utils.CoinsCount(out flag, this.inventory, new int[]
++			{
++				58,
++				57,
++				56,
++				55,
++				54
++			});
++			long num2 = Utils.CoinsCount(out flag, this.bank.item, new int[0]);
++			long num3 = Utils.CoinsCount(out flag, this.bank2.item, new int[0]);
++			long num4 = Utils.CoinsCount(out flag, this.bank3.item, new int[0]);
++			long num5 = Utils.CoinsCombineStacks(out flag, new long[]
++			{
++				num,
++				num2,
++				num3,
++				num4
++			});
++			if (num5 < (long)price)
++			{
+ 				return false;
+ 			}
+ 			return true;
 @@ -26899,7 +_,7 @@
  		{
  			int num = 4;
@@ -4166,7 +4295,7 @@
  									}
  									if (item.axe > 0)
  									{
-@@ -34937,23 +_,23 @@
+@@ -34937,30 +_,30 @@
  										{
  											this.hitTile.Prune();
  										}
@@ -4184,16 +4313,27 @@
  								if (item.pick > 0)
  								{
 -									this.itemTime = (int)((float)item.useTime * this.pickSpeed);
+-								}
+-								if (item.hammer > 0 && Main.tile[Player.tileTargetX, Player.tileTargetY].active() && ((Main.tileSolid[(int)Main.tile[Player.tileTargetX, Player.tileTargetY].type] && Main.tile[Player.tileTargetX, Player.tileTargetY].type != 10) || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 314 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 351 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 424 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 442) && this.poundRelease)
 +									this.itemTime = (int)((float)item.useTime * this.pickSpeed / PlayerHooks.TotalUseTimeMultiplier(this, item));
- 								}
- 								if (item.hammer > 0 && Main.tile[Player.tileTargetX, Player.tileTargetY].active() && ((Main.tileSolid[(int)Main.tile[Player.tileTargetX, Player.tileTargetY].type] && Main.tile[Player.tileTargetX, Player.tileTargetY].type != 10) || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 314 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 351 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 424 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 442) && this.poundRelease)
++								}
++								if (item.hammer > 0 && Main.tile[Player.tileTargetX, Player.tileTargetY].active() && ((Main.tileSolid[(int)Main.tile[Player.tileTargetX, Player.tileTargetY].type] && !TileLoader.IsClosedDoor(Main.tile[Player.tileTargetX, Player.tileTargetY])) || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 314 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 351 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 424 || Main.tile[Player.tileTargetX, Player.tileTargetY].type == 442) && this.poundRelease)
  								{
  									flag19 = false;
 -									this.itemTime = item.useTime;
 +									this.itemTime = (int)(item.useTime / PlayerHooks.TotalUseTimeMultiplier(this, item));
  									num241 += (int)((double)item.hammer * 1.25);
  									num241 = 100;
- 									if (Main.tile[Player.tileTargetX, Player.tileTargetY - 1].active() && Main.tile[Player.tileTargetX, Player.tileTargetY - 1].type == 10)
+-									if (Main.tile[Player.tileTargetX, Player.tileTargetY - 1].active() && Main.tile[Player.tileTargetX, Player.tileTargetY - 1].type == 10)
++									if (Main.tile[Player.tileTargetX, Player.tileTargetY - 1].active() && TileLoader.IsClosedDoor(Main.tile[Player.tileTargetX, Player.tileTargetY - 1]))
+ 									{
+ 										num241 = 0;
+ 									}
+-									if (Main.tile[Player.tileTargetX, Player.tileTargetY + 1].active() && Main.tile[Player.tileTargetX, Player.tileTargetY + 1].type == 10)
++									if (Main.tile[Player.tileTargetX, Player.tileTargetY + 1].active() && TileLoader.IsClosedDoor(Main.tile[Player.tileTargetX, Player.tileTargetY + 1]))
+ 									{
+ 										num241 = 0;
+ 									}
 @@ -34971,7 +_,10 @@
  										{
  											int num242 = Player.tileTargetX;
@@ -4302,7 +4442,7 @@
  						List<ushort> list2 = null;
  						int type5 = item.type;
  						if (type5 == 213)
-@@ -36167,25 +_,53 @@
+@@ -36167,28 +_,53 @@
  								{
  									if (!Main.npc[num323].dontTakeDamage)
  									{
@@ -4328,39 +4468,44 @@
  											Rectangle value19 = new Rectangle((int)Main.npc[num323].position.X, (int)Main.npc[num323].position.Y, Main.npc[num323].width, Main.npc[num323].height);
  											if (r2.Intersects(value19) && (Main.npc[num323].noTileCollide || this.CanHit(Main.npc[num323])))
  											{
- 												bool flag27 = false;
+-												bool flag27 = false;
 -												if (item.melee && Main.rand.Next(1, 101) <= this.meleeCrit)
-+												int critChance = this.meleeCrit;
-+												ItemLoader.GetWeaponCrit(item, this, ref critChance);
-+												PlayerHooks.GetWeaponCrit(this, item, ref critChance);
-+												if (item.melee && Main.rand.Next(1, 101) <= critChance)
++												// patch note: 1.3.6 should include changes: GetWeaponCrit()
++												bool flag27 = false; // flag27, is this hit a crit?
++												int critChance = 0;
++												if (item.melee)
  												{
- 													flag27 = true;
+-													flag27 = true;
++													critChance = this.meleeCrit;
  												}
 -												if (item.ranged && Main.rand.Next(1, 101) <= this.rangedCrit)
-+												critChance = this.rangedCrit;
-+												ItemLoader.GetWeaponCrit(item, this, ref critChance);
-+												PlayerHooks.GetWeaponCrit(this, item, ref critChance);
-+												if (item.ranged && Main.rand.Next(1, 101) <= critChance)
++												else if (item.ranged)
  												{
- 													flag27 = true;
+-													flag27 = true;
++													critChance = this.rangedCrit;
  												}
 -												if (item.magic && Main.rand.Next(1, 101) <= this.magicCrit)
-+												critChance = this.magicCrit;
-+												ItemLoader.GetWeaponCrit(item, this, ref critChance);
-+												PlayerHooks.GetWeaponCrit(this, item, ref critChance);
-+												if (item.magic && Main.rand.Next(1, 101) <= critChance)
++												else if (item.magic)
  												{
- 													flag27 = true;
+-													flag27 = true;
++													critChance = this.magicCrit;
  												}
 -												if (item.thrown && Main.rand.Next(1, 101) <= this.thrownCrit)
-+												critChance = this.thrownCrit;
++												else if (item.thrown)
+ 												{
+-													flag27 = true;
++													critChance = this.thrownCrit;
+ 												}
++												else if (!item.summon) // custom damage class
++												{
++													critChance = item.crit;
++												}
 +												ItemLoader.GetWeaponCrit(item, this, ref critChance);
 +												PlayerHooks.GetWeaponCrit(this, item, ref critChance);
-+												if (item.thrown && Main.rand.Next(1, 101) <= critChance)
++												flag27 = critChance >= 100 || Main.rand.Next(1, 101) <= critChance;
+ 												int num324 = Item.NPCtoBanner(Main.npc[num323].BannerID());
+ 												if (num324 > 0 && this.NPCBannerBuff[num324])
  												{
- 													flag27 = true;
- 												}
 @@ -36208,12 +_,16 @@
  													this.ClearBuff(198);
  												}
@@ -5056,6 +5201,15 @@
  		}
  
  		public static PlayerFileData LoadPlayer(string playerPath, bool cloudSave)
+@@ -38697,7 +_,7 @@
+ 			{
+ 				Main.rand = new UnifiedRandom((int)DateTime.Now.Ticks);
+ 			}
+-			Player player = new Player();
++			Player player = new Player(false); // setup inventory is unnecessary
+ 			try
+ 			{
+ 				RijndaelManaged rijndaelManaged = new RijndaelManaged();
 @@ -38719,7 +_,7 @@
  							{
  								playerFileData.Metadata = FileMetadata.FromCurrentSettings(FileType.Player);
@@ -5111,11 +5265,12 @@
  				}
  				return playerFileData;
  			}
-@@ -39313,13 +_,30 @@
+@@ -39313,13 +_,31 @@
  			return -1;
  		}
  
 -		public Player()
++		internal IList<string> usedMods;
 +		internal ModPlayer[] modPlayers = new ModPlayer[0];
 +
 +		public ModPlayer GetModPlayer(Mod mod, string name)

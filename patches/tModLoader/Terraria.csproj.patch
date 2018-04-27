@@ -107,10 +107,14 @@
      <Reference Include="WindowsBase" />
    </ItemGroup>
    <ItemGroup>
-@@ -327,8 +_,11 @@
+@@ -326,9 +_,15 @@
+     <Compile Include="Terraria.ID\GoreID.cs" />
      <Compile Include="Terraria.ID\InvasionID.cs" />
      <Compile Include="Terraria.ID\ItemAlternativeFunctionID.cs" />
++    <Compile Include="Terraria.ID\ItemHoldStyleID.cs" />
      <Compile Include="Terraria.ID\ItemID.cs" />
++    <Compile Include="Terraria.ID\ItemRarityID.cs" />
++    <Compile Include="Terraria.ID\ItemUseStyleID.cs" />
 +    <Compile Include="Terraria.ID\LangID.cs" />
      <Compile Include="Terraria.ID\MessageID.cs" />
      <Compile Include="Terraria.ID\MountID.cs" />
@@ -119,7 +123,7 @@
      <Compile Include="Terraria.ID\NPCID.cs" />
      <Compile Include="Terraria.ID\PlayerTextureID.cs" />
      <Compile Include="Terraria.ID\PlayerVariantID.cs" />
-@@ -368,6 +_,150 @@
+@@ -368,6 +_,155 @@
      <Compile Include="Terraria.Map\MapHelper.cs" />
      <Compile Include="Terraria.Map\MapTile.cs" />
      <Compile Include="Terraria.Map\WorldMap.cs" />
@@ -146,6 +150,7 @@
 +    <Compile Include="Terraria.ModLoader.IO\BigEndian.cs" />
 +    <Compile Include="Terraria.ModLoader.IO\BinaryIO.cs" />
 +    <Compile Include="Terraria.ModLoader.IO\FontCacheIO.cs" />
++    <Compile Include="Terraria.ModLoader.IO\ImageIO.cs" />
 +    <Compile Include="Terraria.ModLoader.IO\ItemIO.cs" />
 +    <Compile Include="Terraria.ModLoader.IO\MapIO.cs" />
 +    <Compile Include="Terraria.ModLoader.IO\TagSerializer.cs" />
@@ -190,6 +195,7 @@
 +    <Compile Include="Terraria.ModLoader.UI\UIModSourceItem.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UIModSources.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UIUpdateMessage.cs" />
++    <Compile Include="Terraria.ModLoader.UI\UIUploadMod.cs" />
 +    <Compile Include="Terraria.ModLoader\AssemblyManager.cs" />
 +    <Compile Include="Terraria.ModLoader\AutoloadEquip.cs" />
 +    <Compile Include="Terraria.ModLoader\AutoloadHead.cs" />
@@ -212,6 +218,7 @@
 +    <Compile Include="Terraria.ModLoader\GlobalWall.cs" />
 +    <Compile Include="Terraria.ModLoader\Interface.cs" />
 +    <Compile Include="Terraria.ModLoader\ItemLoader.cs" />
++    <Compile Include="Terraria.ModLoader\LocalMod.cs" />
 +    <Compile Include="Terraria.ModLoader\MapEntry.cs" />
 +    <Compile Include="Terraria.ModLoader\MapLegend.cs" />
 +    <Compile Include="Terraria.ModLoader\MapLoader.cs" />
@@ -232,6 +239,7 @@
 +    <Compile Include="Terraria.ModLoader\ModNPC.cs" />
 +    <Compile Include="Terraria.ModLoader\ModPacket.cs" />
 +    <Compile Include="Terraria.ModLoader\ModPlayer.cs" />
++    <Compile Include="Terraria.ModLoader\ModPrefix.cs" />
 +    <Compile Include="Terraria.ModLoader\ModProjectile.cs" />
 +    <Compile Include="Terraria.ModLoader\ModProperties.cs" />
 +    <Compile Include="Terraria.ModLoader\ModRecipe.cs" />
@@ -243,6 +251,7 @@
 +    <Compile Include="Terraria.ModLoader\ModWall.cs" />
 +    <Compile Include="Terraria.ModLoader\ModWaterStyle.cs" />
 +    <Compile Include="Terraria.ModLoader\ModWorld.cs" />
++    <Compile Include="Terraria.ModLoader\MusicPriority.cs" />
 +    <Compile Include="Terraria.ModLoader\NPCSpawnHelper.cs" />
 +    <Compile Include="Terraria.ModLoader\RecipeEditor.cs" />
 +    <Compile Include="Terraria.ModLoader\RecipeFinder.cs" />
@@ -306,12 +315,13 @@
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Game.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Items.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Main.json" />
-@@ -606,5 +_,57 @@
+@@ -606,5 +_,63 @@
      <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.Projectiles.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.Town.json" />
    </ItemGroup>
 +  <ItemGroup>
 +    <Content Include="Icon.ico" />
++    <EmbeddedResource Include="Terraria.ModLoader.UI\ButtonExclamation.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.UI\LoaderBG.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.UI\Loader.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.UI\ButtonError.png" />
@@ -328,6 +338,11 @@
 +    <EmbeddedResource Include="Terraria.Localization.Content.ru-RU.tModLoader.json" />
 +    <EmbeddedResource Include="Terraria.Localization.Content.pt-BR.tModLoader.json" />
 +    <EmbeddedResource Include="Terraria.Localization.Content.pl-PL.tModLoader.json" />
++    <EmbeddedResource Include="Terraria.Localization.Content.es-ES.tModLoader.json" />
++    <EmbeddedResource Include="Terraria.Localization.Content.fr-FR.tModLoader.json" />
++    <EmbeddedResource Include="Terraria.Localization.Content.de-DE.tModLoader.json" />
++    <EmbeddedResource Include="Terraria.Localization.Content.it-IT.tModLoader.json" />
++    <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.tModLoader.json" />
 +  </ItemGroup>
 +  <ItemGroup />
    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
