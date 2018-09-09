@@ -94,15 +94,15 @@ namespace Terraria.ModLoader
 			modBrowser.updateFilterMode = UpdateFilter.Available;
 			modBrowser.searchFilterMode = SearchFilter.Name;
 			modBrowser.modSideFilterMode = ModSideFilter.All;
-			modBrowser.SearchFilterToggle?.setCurrentState((int)modBrowser.searchFilterMode);
-			if (modBrowser._categoryButtons.Count == 3)
+			if (modBrowser._categoryButtons.Count == 4) // basically checking if modBrowser._isInitialized
 			{
 				modBrowser._categoryButtons[0].setCurrentState((int)modBrowser.sortMode);
 				modBrowser._categoryButtons[1].setCurrentState((int)modBrowser.updateFilterMode);
 				modBrowser._categoryButtons[2].setCurrentState((int)modBrowser.modSideFilterMode);
+				modBrowser._categoryButtons[3].setCurrentState((int)modBrowser.searchFilterMode);
 			}
 			modBrowser.loading = false;
-			ModLoader.modsDirCache.Clear();
+			ModOrganizer.modsDirCache.Clear();
 			GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 		}
 
@@ -142,7 +142,7 @@ namespace Terraria.ModLoader
 			{
 				Main.MenuUI.SetState(loadMods);
 				Main.menuMode = 888;
-				ModLoader.Load();
+				ModLoader.BeginLoad();
 			}
 			else if (Main.menuMode == buildModID)
 			{
@@ -238,7 +238,7 @@ namespace Terraria.ModLoader
 			{
 				offY = 210;
 				spacing = 42;
-				numButtons = 7;
+				numButtons = 9;
 				buttonVerticalSpacing[numButtons - 1] = 18;
 				for (int i = 0; i < numButtons; i++)
 				{
@@ -285,6 +285,22 @@ namespace Terraria.ModLoader
 				}
 
 				buttonIndex++;
+				buttonNames[buttonIndex] = Language.GetTextValue($"tModLoader.RemoveForcedMinimumZoom{(ModLoader.removeForcedMinimumZoom ? "Yes" : "No")}");
+				if (selectedMenu == buttonIndex)
+				{
+					Main.PlaySound(SoundID.MenuTick);
+					ModLoader.removeForcedMinimumZoom = !ModLoader.removeForcedMinimumZoom;
+				}
+
+				buttonIndex++;
+				buttonNames[buttonIndex] = Language.GetTextValue($"tModLoader.AllowGreaterResolutions{(ModLoader.allowGreaterResolutions ? "Yes" : "No")}");
+				if (selectedMenu == buttonIndex)
+				{
+					Main.PlaySound(SoundID.MenuTick);
+					ModLoader.allowGreaterResolutions = !ModLoader.allowGreaterResolutions;
+				}
+
+				buttonIndex++;
 				buttonNames[buttonIndex] = Language.GetTextValue("tModLoader.ClearMBCredentials");
 				if (selectedMenu == buttonIndex)
 				{
@@ -311,7 +327,7 @@ namespace Terraria.ModLoader
 			{
 				Console.WriteLine("Terraria Server " + Main.versionNumber2 + " - " + ModLoader.versionedName);
 				Console.WriteLine();
-				var mods = ModLoader.FindMods();
+				var mods = ModOrganizer.FindMods();
 				for (int k = 0; k < mods.Length; k++)
 				{
 					Console.Write((k + 1) + "\t\t" + mods[k].DisplayName);
@@ -354,7 +370,7 @@ namespace Terraria.ModLoader
 				{
 					Console.WriteLine("Unloading mods...");
 					ModLoader.Unload();
-					ModLoader.do_Load(null);
+					ModLoader.Load();
 					exit = true;
 				}
 				else if (int.TryParse(command, out int value) && value > 0 && value <= mods.Length)

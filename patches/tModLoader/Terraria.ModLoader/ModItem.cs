@@ -73,18 +73,29 @@ namespace Terraria.ModLoader
 		/// </summary>
 		public virtual string Texture => (GetType().Namespace + "." + Name).Replace('.', '/');
 
-		/// <summary>
-		/// Setting this to true makes it so that this weapon can shoot projectiles only at the beginning of its animation. Set this to true if you want a sword and its projectile creation to be in sync (for example, the Terra Blade). Defaults to false.
-		/// </summary>
+		[Obsolete("override ModItem.OnlyShootOnSwing property", true)]
 		public bool projOnSwing;
-		/// <summary>
-		/// The type of NPC that drops this boss bag. Used to determine how many coins this boss bag contains. Defaults to 0, which means this isn't a boss bag.
-		/// </summary>
+
+		[Obsolete("override ModItem.BossBagNPC property", true)]
 		public int bossBagNPC;
+
+		[Obsolete]
+		private bool ProjOnSwing_Obsolete
+		{
+			get => projOnSwing;
+			set => projOnSwing = value;
+		}
+
+		[Obsolete]
+		private int BossBagNPC_Obsolete
+		{
+			get => bossBagNPC;
+			set => bossBagNPC = value;
+		}
 
 		public ModItem()
 		{
-			item = new Item {modItem = this};
+			item = new Item { modItem = this };
 		}
 
 		/// <summary>
@@ -130,8 +141,10 @@ namespace Terraria.ModLoader
 		/// If CloneNewInstances is true, just calls Clone()
 		/// Otherwise calls the default constructor and copies fields
 		/// </summary>
-		public virtual ModItem NewInstance(Item itemClone) {
-			if (CloneNewInstances) {
+		public virtual ModItem NewInstance(Item itemClone)
+		{
+			if (CloneNewInstances)
+			{
 				var clone = Clone();
 				clone.item = itemClone;
 				return clone;
@@ -141,8 +154,8 @@ namespace Terraria.ModLoader
 			copy.item = itemClone;
 			copy.mod = mod;
 			copy.Name = Name;
-			copy.projOnSwing = projOnSwing;
-			copy.bossBagNPC = bossBagNPC;
+			copy.ProjOnSwing_Obsolete = ProjOnSwing_Obsolete;
+			copy.BossBagNPC_Obsolete = BossBagNPC_Obsolete;
 			return copy;
 		}
 
@@ -150,7 +163,7 @@ namespace Terraria.ModLoader
 		/// This is where you set all your item's properties, such as width, damage, shootSpeed, defense, etc. 
 		/// For those that are familiar with tAPI, this has the same function as .json files.
 		/// </summary>
-		public virtual void SetDefaults() 
+		public virtual void SetDefaults()
 		{
 		}
 
@@ -173,13 +186,14 @@ namespace Terraria.ModLoader
 		/// <summary>
 		/// Automatically sets certain static defaults. Override this if you do not want the properties to be set for you.
 		/// </summary>
-		public virtual void AutoStaticDefaults() {
-			Main.itemTexture[item.type] = ModLoader.GetTexture(Texture);
+		public virtual void AutoStaticDefaults()
+		{
+			Main.itemTexture[item.type] = ModContent.GetTexture(Texture);
 
 			var flameTexture = Texture + "_Flame";
-			if (ModLoader.TextureExists(flameTexture))
+			if (ModContent.TextureExists(flameTexture))
 			{
-				Main.itemFlameTexture[item.type] = ModLoader.GetTexture(flameTexture);
+				Main.itemFlameTexture[item.type] = ModContent.GetTexture(flameTexture);
 				Main.itemFlameLoaded[item.type] = true;
 			}
 
@@ -250,6 +264,26 @@ namespace Terraria.ModLoader
 		}
 
 		/// <summary>
+		/// Allows you to temporarily modify the amount of life a life healing item will heal for, based on player buffs, accessories, etc. This is only called for items with a healLife value.
+		/// </summary>
+		/// <param name="player">The player using the item.</param>
+		/// <param name="quickHeal">Whether the item is being used through quick heal or not.</param>
+		/// <param name="healValue">The amount of life being healed.</param>
+		public virtual void GetHealLife(Player player, bool quickHeal, ref int healValue)
+		{
+		}
+
+		/// <summary>
+		/// Allows you to temporarily modify the amount of mana a mana healing item will heal for, based on player buffs, accessories, etc. This is only called for items with a healMana value.
+		/// </summary>
+		/// <param name="player">The player using the item.</param>
+		/// <param name="quickHeal">Whether the item is being used through quick heal or not.</param>
+		/// <param name="healValue">The amount of mana being healed.</param>
+		public virtual void GetHealMana(Player player, bool quickHeal, ref int healValue)
+		{
+		}
+
+		/// <summary>
 		/// Allows you to temporarily modify this weapon's damage based on player buffs, etc. This is useful for creating new classes of damage, or for making subclasses of damage (for example, Shroomite armor set boosts).
 		/// Note that tModLoader follows vanilla principle of only allowing one effective damage class at a time.
 		/// This means that if you want your own custom damage class, all vanilla damage classes must be set to false.
@@ -303,12 +337,22 @@ namespace Terraria.ModLoader
 
 		/// <summary>
 		/// Whether or not ammo will be consumed upon usage. Called both by the gun and by the ammo; if at least one returns false then the ammo will not be used. By default returns true.
+		/// If false is returned, the OnConsumeAmmo hook is never called.
 		/// </summary>
 		/// <param name="player">The player.</param>
 		/// <returns></returns>
 		public virtual bool ConsumeAmmo(Player player)
 		{
 			return true;
+		}
+
+		/// <summary>
+		/// Allows you to makes things happen when ammo is consumed. Called both by the gun and by the ammo.
+		/// Called before the ammo stack is reduced.
+		/// </summary>
+		/// <param name="player">The player.</param>
+		public virtual void OnConsumeAmmo(Player player)
+		{
 		}
 
 		/// <summary>
@@ -429,12 +473,22 @@ namespace Terraria.ModLoader
 
 		/// <summary>
 		/// If this item is consumable and this returns true, then this item will be consumed upon usage. Returns true by default.
+		/// If false is returned, the OnConsumeItem hook is never called.
 		/// </summary>
 		/// <param name="player">The player.</param>
 		/// <returns></returns>
 		public virtual bool ConsumeItem(Player player)
 		{
 			return true;
+		}
+
+		/// <summary>
+		/// Allows you to make things happen when this item is consumed.
+		/// Called before the item stack is reduced.
+		/// </summary>
+		/// <param name="player">The player.</param>
+		public virtual void OnConsumeItem(Player player)
+		{
 		}
 
 		/// <summary>
@@ -513,7 +567,7 @@ namespace Terraria.ModLoader
 		}
 
 		/// <summary>
-		/// Allows you to give set bonuses to the armor set that this armor is in.
+		/// Allows you to give set bonuses to the armor set that this armor is in. Set player.setBonus to a string for the bonus description.
 		/// </summary>
 		/// <param name="player">The player.</param>
 		public virtual void UpdateArmorSet(Player player)
@@ -901,7 +955,7 @@ namespace Terraria.ModLoader
 		/// Allows you to disallow the player from equipping this accessory. Return false to disallow equipping this accessory. Returns true by default.
 		/// </summary>
 		/// <param name="player">The player.</param>
-		/// <param name="slot">The slot.</param>
+		/// <param name="slot">The inventory slot that the item is attempting to occupy.</param>
 		public virtual bool CanEquipAccessory(Player player, int slot)
 		{
 			return true;
@@ -958,6 +1012,16 @@ namespace Terraria.ModLoader
 		public virtual void AnglerQuestChat(ref string description, ref string catchLocation)
 		{
 		}
+		
+		/// <summary>
+		/// Setting this to true makes it so that this weapon can shoot projectiles only at the beginning of its animation. Set this to true if you want a sword and its projectile creation to be in sync (for example, the Terra Blade). Defaults to false.
+		/// </summary>
+		public virtual bool OnlyShootOnSwing => ProjOnSwing_Obsolete;
+
+		/// <summary>
+		/// The type of NPC that drops this boss bag. Used to determine how many coins this boss bag contains. Defaults to 0, which means this isn't a boss bag.
+		/// </summary>
+		public virtual int BossBagNPC => BossBagNPC_Obsolete;
 
 		/// <summary>
 		/// Allows you to save custom data for this item. Returns null by default.

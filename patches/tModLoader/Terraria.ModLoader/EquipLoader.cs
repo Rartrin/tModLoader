@@ -30,7 +30,7 @@ namespace Terraria.ModLoader
 		internal static readonly IDictionary<int, string> femaleTextures = new Dictionary<int, string>();
 		internal static readonly IDictionary<int, string> armTextures = new Dictionary<int, string>();
 
-		public static readonly EquipType[] EquipTypes = (EquipType[]) Enum.GetValues(typeof (EquipType));
+		public static readonly EquipType[] EquipTypes = (EquipType[])Enum.GetValues(typeof(EquipType));
 
 		static EquipLoader()
 		{
@@ -108,10 +108,11 @@ namespace Terraria.ModLoader
 				{
 					int slot = entry.Key;
 					EquipTexture texture = entry.Value;
-					GetTextureArray(type)[slot] = ModLoader.GetTexture(texture.Texture);
-					if (type == EquipType.Body) {
-						Main.femaleBodyTexture[slot] = ModLoader.GetTexture(femaleTextures[slot]);
-						Main.armorArmTexture[slot] = ModLoader.GetTexture(armTextures[slot]);
+					GetTextureArray(type)[slot] = ModContent.GetTexture(texture.Texture);
+					if (type == EquipType.Body)
+					{
+						Main.femaleBodyTexture[slot] = ModContent.GetTexture(femaleTextures[slot]);
+						Main.armorArmTexture[slot] = ModContent.GetTexture(armTextures[slot]);
 					}
 				}
 			}
