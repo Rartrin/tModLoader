@@ -1,22 +1,18 @@
 --- src/decompiled\Terraria\Netplay.cs
 +++ src/merged\Terraria\Netplay.cs
-@@ -2,6 +_,9 @@
+@@ -2,6 +_,7 @@
  using System.IO;
  using System.Net;
  using System.Net.Sockets;
-+#if !WINDOWS
 +using System.Runtime.CompilerServices;
-+#endif
  using System.Threading;
  using Terraria.IO;
  using Terraria.Localization;
-@@ -9,6 +_,12 @@
+@@ -9,6 +_,10 @@
  using Terraria.Net.Sockets;
  using Terraria.Social;
  using Terraria.Utilities;
-+#if !WINDOWS
 +using Terraria.Social.Base;
-+#endif
 +#if SERVER
 +using NATUPNPLib;
 +#endif
@@ -75,15 +71,16 @@
  		}
  
  		public static string GetLocalIPAddress()
-@@ -202,6 +_,11 @@
+@@ -202,6 +_,12 @@
  				}
  				catch
  				{
-+#if MAC
++					if(PlatformUtilities.IsOSX)
++					{
 +					Thread.Sleep(200);
 +					Netplay.Connection.Socket.Close();
 +					Netplay.Connection.Socket = new TcpSocket();
-+#endif
++					}
  					if (!Netplay.disconnect && Main.gameMenu)
  					{
  						flag = true;

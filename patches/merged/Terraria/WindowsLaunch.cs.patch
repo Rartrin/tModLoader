@@ -5,15 +5,20 @@
  using System;
  using System.IO;
  using System.Reflection;
-@@ -70,7 +_,12 @@
+@@ -70,7 +_,16 @@
  				}
  				return result;
  			};
+-			Program.LaunchGame(args, false);
++			if(Utilities.PlatformUtilities.IsMono)
++			{
++				Environment.SetEnvironmentVariable("FNA_WORKAROUND_WINDOW_RESIZABLE", "1");
++			}
 +#if SERVER
 +			WindowsLaunch._handleRoutine = new WindowsLaunch.HandlerRoutine(WindowsLaunch.ConsoleCtrlCheck);
 +			WindowsLaunch.SetConsoleCtrlHandler(WindowsLaunch._handleRoutine, true);
 +#endif
- 			Program.LaunchGame(args, false);
++			Program.LaunchGame(args, Utilities.PlatformUtilities.IsMono);
  		}
  	}
  }

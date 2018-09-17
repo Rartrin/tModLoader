@@ -1,11 +1,11 @@
---- src/Terraria\Terraria.Social\SocialAPI.cs
-+++ src/tModLoader\Terraria.Social\SocialAPI.cs
-@@ -29,6 +_,9 @@
+--- src/merged\Terraria.Social\SocialAPI.cs
++++ src/Terraria\Terraria.Social\SocialAPI.cs
+@@ -35,6 +_,9 @@
  			{
  				mode = new SocialMode?(SocialMode.None);
  #if CLIENT
 +#if DEBUG
-+                if (!Program.LaunchParameters.ContainsKey("-nosteam"))
++				if(!Program.LaunchParameters.ContainsKey("-nosteam"))
 +#endif
  				mode = new SocialMode?(SocialMode.Steam);
  #else

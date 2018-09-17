@@ -1,18 +1,6 @@
 --- src/Terraria\Terraria\Tile.cs
 +++ src/tModLoader\Terraria\Tile.cs
-@@ -4,9 +_,9 @@
- 
- namespace Terraria
- {
--	#if !WINDOWS
-+#if !WINDOWS
- 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
--	#endif
-+#endif
- 	public class Tile
- 	{
- 		public const int Type_Solid = 0;
-@@ -19,9 +_,10 @@
+@@ -17,9 +_,10 @@
  		public const int Liquid_Lava = 1;
  		public const int Liquid_Honey = 2;
  		public ushort type;
@@ -20,12 +8,12 @@
 +		public ushort wall;
  		public byte liquid;
 -		public short sTileHeader;
-+		// bitwise manipulations on signed values in C# apparently doesn't follow the C standards so the one unused bit in sTileHeader would have to have a unique way to access it.
++		// bitwise manipulations on signed values in C# might not follow the C standards so the one unused bit in sTileHeader would have to have a unique way to access it.
 +		public ushort sTileHeader;
  		public byte bTileHeader;
  		public byte bTileHeader2;
  		public byte bTileHeader3;
-@@ -417,7 +_,7 @@
+@@ -415,7 +_,7 @@
  			{
  				color = 30;
  			}
@@ -34,7 +22,7 @@
  		}
  
  		public bool active()
-@@ -432,7 +_,7 @@
+@@ -430,7 +_,7 @@
  				this.sTileHeader |= 32;
  				return;
  			}
@@ -43,7 +31,7 @@
  		}
  
  		public bool inActive()
-@@ -447,7 +_,7 @@
+@@ -445,7 +_,7 @@
  				this.sTileHeader |= 64;
  				return;
  			}
@@ -52,7 +40,7 @@
  		}
  
  		public bool wire()
-@@ -462,7 +_,7 @@
+@@ -460,7 +_,7 @@
  				this.sTileHeader |= 128;
  				return;
  			}
@@ -61,7 +49,7 @@
  		}
  
  		public bool wire2()
-@@ -477,7 +_,7 @@
+@@ -475,7 +_,7 @@
  				this.sTileHeader |= 256;
  				return;
  			}
@@ -70,7 +58,7 @@
  		}
  
  		public bool wire3()
-@@ -492,7 +_,7 @@
+@@ -490,7 +_,7 @@
  				this.sTileHeader |= 512;
  				return;
  			}
@@ -79,7 +67,7 @@
  		}
  
  		public bool halfBrick()
-@@ -507,7 +_,7 @@
+@@ -505,7 +_,7 @@
  				this.sTileHeader |= 1024;
  				return;
  			}
@@ -88,7 +76,7 @@
  		}
  
  		public bool actuator()
-@@ -522,7 +_,7 @@
+@@ -520,7 +_,7 @@
  				this.sTileHeader |= 2048;
  				return;
  			}
@@ -97,7 +85,7 @@
  		}
  
  		public byte slope()
-@@ -532,7 +_,7 @@
+@@ -530,7 +_,7 @@
  
  		public void slope(byte slope)
  		{

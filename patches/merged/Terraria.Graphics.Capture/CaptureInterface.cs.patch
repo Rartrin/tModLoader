@@ -1,10 +1,10 @@
 --- src/decompiled\Terraria.Graphics.Capture\CaptureInterface.cs
 +++ src/merged\Terraria.Graphics.Capture\CaptureInterface.cs
-@@ -1128,7 +_,17 @@
+@@ -1128,6 +_,15 @@
  					if (i == num2++ && flag2 && flag)
  					{
  						string fileName = Path.Combine(Main.SavePath, "Captures");
-+#if LINUX
++						if(Utilities.PlatformUtilities.IsLinux)
 +						Process.Start(new ProcessStartInfo(fileName)
 +						{
 +							FileName = "open-folder",
@@ -12,10 +12,8 @@
 +							UseShellExecute = true,
 +							CreateNoWindow = true
 +						});
-+#else
++						else
  						Process.Start(fileName);
-+#endif
  					}
  					if (i == num2++ && flag2)
- 					{
 

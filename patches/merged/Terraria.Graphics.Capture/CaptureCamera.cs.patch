@@ -1,37 +1,31 @@
 --- src/decompiled\Terraria.Graphics.Capture\CaptureCamera.cs
 +++ src/merged\Terraria.Graphics.Capture\CaptureCamera.cs
-@@ -5,9 +_,14 @@
- using System.Drawing;
- using System.Drawing.Imaging;
- using System.IO;
-+#if WINDOWS
+@@ -8,6 +_,7 @@
  using System.Runtime.InteropServices;
-+#endif
  using System.Threading;
  using Terraria.Localization;
-+#if !WINDOWS
 +using Terraria.Utilities;
-+#endif
  
  namespace Terraria.Graphics.Capture
  {
-@@ -206,10 +_,17 @@
+@@ -206,10 +_,18 @@
  					{
  						for (int j = 0; j < area.Width; j++)
  						{
 -							ptr2[2] = *ptr4;
-+#if WINDOWS
++							if(PlatformUtilities.IsWindows)
++							{
 +							ptr2[2] = ptr4[0];
  							ptr2[1] = ptr4[1];
 -							*ptr2 = ptr4[2];
 +							ptr2[0] = ptr4[2];
  							ptr2[3] = ptr4[3];
-+#else
++							}else{
 +							ptr2[0] = ptr4[0];
 +							ptr2[1] = ptr4[1];
 +							ptr2[2] = ptr4[2];
 +							ptr2[3] = ptr4[3];
-+#endif
++							}
  							ptr4 += 4;
  							ptr2 += 4;
  						}
@@ -39,20 +33,19 @@
  					"Captures",
  					Path.DirectorySeparatorChar
  				}));
-+#if WINDOWS
++				if(PlatformUtilities.IsWindows)
  				using (Bitmap bitmap = new Bitmap(width, height))
  				{
  					System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, width, height);
-@@ -247,6 +_,12 @@
+@@ -247,6 +_,11 @@
  					bitmap.Save(filename, imageFormat);
  					bitmap.Dispose();
  				}
-+#else
++				else
 +				using (FileStream fileStream = File.Create(filename))
 +				{
 +					PlatformUtilities.SavePng(fileStream, width, height, width, height, this._outputData);
 + 				}
-+#endif
  				result = true;
  			}
  			catch (Exception value)
@@ -70,24 +63,25 @@
  				{
  					for (int j = 0; j < width; j++)
  					{
-+#if WINDOWS
++						if(PlatformUtilities.IsWindows)
++						{
  						byte b = this._outputData[num + 2];
  						this._outputData[num2 + 2] = this._outputData[num];
  						this._outputData[num2] = b;
  						this._outputData[num2 + 1] = this._outputData[num + 1];
  						this._outputData[num2 + 3] = this._outputData[num + 3];
-+#else
++						}else{
 +						this._outputData[num2] = this._outputData[num];
 +						this._outputData[num2 + 1] = this._outputData[num + 1];
 +						this._outputData[num2 + 2] = this._outputData[num + 2];
 +						this._outputData[num2 + 3] = this._outputData[num + 3];
-+#endif
++						}
  						num += 4;
  						num2 += 4;
  					}
  					num += texture.Width - width << 2;
  				}
-+#if WINDOWS
++			if(PlatformUtilities.IsWindows)
 +			using (Bitmap bitmap = new Bitmap(width, height))
 +			{
 +				System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, width, height);
@@ -97,12 +91,11 @@
  				bitmap.UnlockBits(bitmapData);
  				bitmap.Save(filename2, imageFormat);
  			}
-+#else
++			else
 +			using (FileStream fileStream = File.Create(filename2))
 +			{
 +				PlatformUtilities.SavePng(fileStream, width, height, width, height, this._outputData);
 + 			}
-+#endif
  		}
  
  		private void FinishCapture()

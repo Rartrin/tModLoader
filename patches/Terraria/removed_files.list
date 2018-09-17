@@ -7,3 +7,8 @@ Terraria.Localization.Content.pl-PL.json
 Terraria.Localization.Content.pt-BR.json
 Terraria.Localization.Content.ru-RU.json
 Terraria.Localization.Content.zh-Hans.json
+.vs\Terraria\v15\.suo
+.vs\Terraria\v15\Server\sqlite3\db.lock
+.vs\Terraria\v15\Server\sqlite3\storage.ide
+.vs\Terraria\v15\Server\sqlite3\storage.ide-shm
+.vs\Terraria\v15\Server\sqlite3\storage.ide-wal

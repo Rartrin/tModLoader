@@ -1,28 +1,18 @@
 --- src/decompiled\Terraria\Main.cs
 +++ src/merged\Terraria\Main.cs
-@@ -4,6 +_,9 @@
+@@ -4,6 +_,7 @@
  using Microsoft.Xna.Framework.Content;
  using Microsoft.Xna.Framework.Graphics;
  using Microsoft.Xna.Framework.Input;
-+#if MAC
 +using SDL2;
-+#endif
  using ReLogic.Graphics;
  using ReLogic.Localization.IME;
  using ReLogic.OS;
-@@ -11,10 +_,15 @@
- using System;
- using System.Collections.Generic;
- using System.Diagnostics;
-+#if WINDOWS
- using System.Drawing;
-+#endif
+@@ -15,6 +_,7 @@
  using System.IO;
  using System.Linq;
  using System.Reflection;
-+#if !WINDOWS
 +using System.Runtime.CompilerServices;
-+#endif
  using System.Runtime.InteropServices;
  using System.Text;
  using System.Threading;
@@ -48,7 +38,7 @@
  				LockOnHelper.UseMode = LockOnHelper.LockOnMode.ThreeDS;
  			}
  			Main.Configuration.Get<bool>("InvisibleCursorForGamepad", ref Main.InvisibleCursorForGamepad);
-+#if CLIENT && WINDOWS
++#if CLIENT && XNA
  			Form form = (Form)Control.FromHandle(Main.instance.Window.Handle);
  			if (Main.screenBorderless)
  			{
@@ -64,41 +54,42 @@
  								}
  								if (num >= 91 && binaryReader.ReadBoolean())
  								{
-+#if CLIENT && WINDOWS
++#if CLIENT && XNA
  									Form form = (Form)Control.FromHandle(base.Window.Handle);
  									form.WindowState = FormWindowState.Maximized;
 +#endif
  								}
  								if (num >= 4)
  								{
-@@ -4731,8 +_,13 @@
+@@ -4731,8 +_,14 @@
  			{
  				if (!Main.WorldList[i].IsCloudSave)
  				{
-+#if WINDOWS
++					if(PlatformUtilities.IsWindows)
++					{
  					FileOperationAPIWrapper.MoveToRecycleBin(Main.WorldList[i].Path);
  					FileOperationAPIWrapper.MoveToRecycleBin(Main.WorldList[i].Path + ".bak");
-+#else
++					}else{
 +					File.Delete(Main.WorldList[i].Path);
 +					File.Delete(Main.WorldList[i].Path + ".bak");
-+#endif
++					}
  				}
  				else if (SocialAPI.Cloud != null)
  				{
-@@ -5164,11 +_,13 @@
+@@ -5164,10 +_,13 @@
  			{
  				string text = "terraria" + Main.rand.Next(2147483647);
  				Console.Title = text;
-+#if WINDOWS
++				if(PlatformUtilities.IsWindows)
++				{
  				IntPtr intPtr = Main.FindWindow(null, text);
  				if (intPtr != IntPtr.Zero)
  				{
  					Main.ShowWindow(intPtr, 0);
++				}
  				}
-+#endif
  			}
  			else
- 			{
 @@ -6068,14 +_,18 @@
  		public Main()
  		{
@@ -147,8 +138,9 @@
  				Main.ActivePlayerFileData.StartPlayTimer();
  				Player.Hooks.EnterWorld(Main.myPlayer);
  			}
-+#if CLIENT && WINDOWS
- 			else
+-			else
++#if CLIENT
++			else if(PlatformUtilities.IsWindows)
  			{
  				IntPtr systemMenu = Main.GetSystemMenu(base.Window.Handle, false);
  				int menuItemCount = Main.GetMenuItemCount(systemMenu);
@@ -177,11 +169,10 @@
  			foreach (DisplayMode current in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
  			{
  				if (current.Width >= Main.minScreenW && current.Height >= Main.minScreenH && current.Width <= Main.maxScreenW && current.Height <= Main.maxScreenH)
-@@ -9809,6 +_,30 @@
+@@ -9809,6 +_,28 @@
  
  		protected void UpdateAudio()
  		{
-+#if !WINDOWS
 +			if (Main.engine != null)
 +			{
 +				Main.engine.Update();
@@ -204,7 +195,6 @@
 +					}
 +				}
 +			}
-+#endif
  			if (!Main.dedServ)
  			{
  				bool flag = (!Main.hasFocus || Main.gamePaused) && Main.netMode == 0;
@@ -221,6 +211,16 @@
  			if (Main._hasPendingNetmodeChange)
  			{
  				Main.netMode = Main._targetNetMode;
+@@ -13508,7 +_,9 @@
+ 					Liquid.cycles = 1;
+ 				}
+ 				Main.hasFocus = base.IsActive;
++#if XNA
+ 				Main.hasFocus = (Form.ActiveForm == Control.FromHandle(base.Window.Handle) as Form);
++#endif
+ 				if (!Main.gameMenu || Main.netMode == 2)
+ 				{
+ 					WorldFile.tempRaining = Main.raining;
 @@ -15588,6 +_,7 @@
  
  		public static string GetInputText(string oldString)
@@ -239,7 +239,7 @@
  		}
  
  		public void MouseTextHackZoom(string text)
-@@ -43882,8 +_,13 @@
+@@ -43882,8 +_,12 @@
  		protected void QuitGame()
  		{
  			Main.SaveSettings();
@@ -247,17 +247,17 @@
  			SocialAPI.Shutdown();
 +#endif
  			base.Exit();
-+#if MAC
++			if(PlatformUtilities.IsOSX)
 +			SDL.SDL_DestroyWindow(base.Window.Handle);
-+#endif
  		}
  
  		protected Microsoft.Xna.Framework.Color randColor()
-@@ -44645,6 +_,16 @@
+@@ -44645,6 +_,17 @@
  							"\" -lang ",
  							Language.ActiveCulture.LegacyId
  						});
-+#if LINUX
++						if(PlatformUtilities.IsLinux)
++						{
 +						if (IntPtr.Size == 8)
 +						{
 +							text += " -x64";
@@ -266,19 +266,16 @@
 +						{
 +							text += " -x86";
 +						}
-+#endif
++						}
  						if (Main.ActiveWorldFileData.IsCloudSave)
  						{
  							text = text + " -cloudworld \"" + Main.worldPathName + "\"";
-@@ -44653,7 +_,11 @@
+@@ -44653,7 +_,7 @@
  						{
  							text = text + " -world \"" + Main.worldPathName + "\"";
  						}
-+#if WINDOWS
- 						this.tServer.StartInfo.FileName = "TerrariaServer.exe";
-+#else
-+						this.tServer.StartInfo.FileName = "TerrariaServer";
-+#endif
+-						this.tServer.StartInfo.FileName = "TerrariaServer.exe";
++						this.tServer.StartInfo.FileName = PlatformUtilities.IsWindows?"TerrariaServer.exe":"TerrariaServer";
  						this.tServer.StartInfo.Arguments = text;
  						if (Main.libPath != "")
  						{
@@ -286,7 +283,7 @@
  						{
  							array7[num27] = 0.85f;
  						}
-+#if WINDOWS
++#if XNA
  						bool flag7 = true;
  						Form form = (Form)Control.FromHandle(Main.instance.Window.Handle);
  						System.Drawing.Rectangle bounds = Screen.FromPoint(form.Location).Bounds;
@@ -304,7 +301,7 @@
  			base.GraphicsDevice.SetRenderTarget(this.backWaterTarget);
  			base.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Transparent);
  			Main.spriteBatch.Begin();
-+#if WINDOWS
++#if UNSAFE_VERSION
  			Main.tileBatch.Begin();
 +#else
 +			Main.tileBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend);
@@ -354,35 +351,29 @@
  			if (NPC.MoonLordCountdown > 0)
  			{
  				NPC.MoonLordCountdown--;
-@@ -61425,6 +_,9 @@
+@@ -61425,6 +_,7 @@
  		public static void PlaySoundInstance(SoundEffectInstance sound)
  		{
  			sound.Play();
-+#if !WINDOWS
 +			ActiveSoundInstances.Add(sound);
-+#endif
  		}
  
  		public static ActiveSound GetActiveSound(SlotId id)
-@@ -61490,6 +_,11 @@
+@@ -61490,6 +_,9 @@
  
  		public static SoundEffectInstance PlaySound(int type, int x = -1, int y = -1, int Style = 1, float volumeScale = 1f, float pitchOffset = 0f)
  		{
-+#if !WINDOWS
 +			object audioLock = Main._audioLock;
 +			lock (audioLock)
 +			{
-+#endif
  			int num = Style;
  			try
  			{
-@@ -62207,6 +_,9 @@
+@@ -62207,6 +_,7 @@
  			{
  			}
  			return null;
-+#if !WINDOWS
 +			}
-+#endif
  		}
  
  		public static void ClearPendingPlayerSelectCallbacks()
@@ -390,7 +381,7 @@
  			{
  				Main.graphics.ToggleFullScreen();
  			}
-+#if WINDOWS
++#if XNA
  			Main.screenMaximized = (((Form)Control.FromHandle(Main.instance.Window.Handle)).WindowState == FormWindowState.Maximized);
  			if (Main.screenBorderless && Main.screenMaximized && !Main.graphics.IsFullScreen)
  			{
@@ -408,7 +399,7 @@
  			int num4;
  			if (Main.screenBorderless || Main.screenMaximized || Main.graphics.IsFullScreen)
  			{
-+#if WINDOWS
++#if XNA
  				form.MinimumSize = new Size(0, 0);
  				if (Main.screenBorderless && !Main.graphics.IsFullScreen && Main.screenBorderlessPendingResizes > 0)
  				{
@@ -420,11 +411,27 @@
  				if (width > Main.maxScreenW)
  				{
  					float num = (float)height / (float)width;
-@@ -62331,18 +_,21 @@
+@@ -62318,9 +_,12 @@
+ 				{
+ 					num3 = Math.Max(Main.graphics.PreferredBackBufferWidth, Main.graphics.GraphicsDevice.Viewport.Width);
+ 					num4 = Math.Max(Main.graphics.PreferredBackBufferHeight, Main.graphics.GraphicsDevice.Viewport.Height);
+-					if (num3 != Main.graphics.PreferredBackBufferWidth || num4 != Main.graphics.PreferredBackBufferHeight)
+-					{
+-						flag2 = true;
++					uint pixelDifference=Math.Abs(Main.graphics.PreferredBackBufferWidth-num3)+Math.Abs(Main.graphics.PreferredBackBufferHeight-num4);
++					flag2=pixelDifference>1;
++					if(!flag2)
++					{
++						num3=Main.graphics.PreferredBackBufferWidth;
++						num4=Main.graphics.PreferredBackBufferHeight;
+ 					}
+ 				}
+ 				else
+@@ -62331,18 +_,27 @@
  			}
  			else
  			{
-+#if WINDOWS
++#if XNA
  				form.MinimumSize = new Size(Main.minScreenW, Main.minScreenH);
  				if (flag)
  				{
@@ -436,9 +443,17 @@
  				height = Math.Min(height, Main.maxScreenH);
  				num3 = Main.graphics.GraphicsDevice.Viewport.Width;
  				num4 = Main.graphics.GraphicsDevice.Viewport.Height;
- 				flag2 = (Main.graphics.PreferredBackBufferWidth != Main.graphics.GraphicsDevice.Viewport.Width || Main.graphics.PreferredBackBufferHeight != Main.graphics.GraphicsDevice.Viewport.Height);
- 			}
-+#if WINDOWS
+-				flag2 = (Main.graphics.PreferredBackBufferWidth != Main.graphics.GraphicsDevice.Viewport.Width || Main.graphics.PreferredBackBufferHeight != Main.graphics.GraphicsDevice.Viewport.Height);
+-			}
++				uint pixelDifference=Math.Abs(Main.graphics.PreferredBackBufferWidth-Main.graphics.GraphicsDevice.Viewport.Width)+Math.Abs(Main.graphics.PreferredBackBufferHeight-Main.graphics.GraphicsDevice.Viewport.Height);
++				flag2=pixelDifference>1;
++				if(!flag2)
++				{
++					num3=Main.graphics.PreferredBackBufferWidth;
++					num4=Main.graphics.PreferredBackBufferHeight;
++				}
++			}
++#if XNA
  			if (!fullscreen && !flag2)
  			{
  				if (form.ClientSize.Width < Main.graphics.PreferredBackBufferWidth)
@@ -454,7 +469,7 @@
  				Main.PendingResolutionWidth = Main.screenWidth;
  				Main.PendingResolutionHeight = Main.screenHeight;
  				PlayerInput.CacheOriginalScreenDimensions();
-+#if WINDOWS
++#if XNA
  				if (!fullscreen)
  				{
  					form.SendToBack();

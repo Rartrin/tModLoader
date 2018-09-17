@@ -1,33 +1,37 @@
 --- src/decompiled\Terraria.Net.Sockets\TcpSocket.cs
 +++ src/merged\Terraria.Net.Sockets\TcpSocket.cs
-@@ -75,7 +_,13 @@
+@@ -75,7 +_,15 @@
  
  		private void SendCallback(IAsyncResult result)
  		{
-+#if WINDOWS
- 			Tuple<SocketSendCallback, object> tuple = (Tuple<SocketSendCallback, object>)result.AsyncState;
-+#else
+-			Tuple<SocketSendCallback, object> tuple = (Tuple<SocketSendCallback, object>)result.AsyncState;
++			Tuple<SocketSendCallback, object> tuple;
++			if(Utilities.PlatformUtilities.IsWindows)
++			tuple = (Tuple<SocketSendCallback, object>)result.AsyncState;
++			else
++			{
 +			object[] expr_0B = (object[])result.AsyncState;
 +			LegacyNetBufferPool.ReturnBuffer((byte[])expr_0B[1]);
-+			Tuple<SocketSendCallback, object> tuple = (Tuple<SocketSendCallback, object>)expr_0B[0];
-+#endif
++			tuple = (Tuple<SocketSendCallback, object>)expr_0B[0];
++			}
  			try
  			{
  				this._connection.GetStream().EndWrite(result);
-@@ -93,7 +_,16 @@
+@@ -93,7 +_,17 @@
  
  		void ISocket.AsyncSend(byte[] data, int offset, int size, SocketSendCallback callback, object state)
  		{
-+#if WINDOWS
++			if(Utilities.PlatformUtilities.IsWindows)
  			this._connection.GetStream().BeginWrite(data, 0, size, new AsyncCallback(this.SendCallback), new Tuple<SocketSendCallback, object>(callback, state));
-+#else
++			else
++			{
 +			byte[] array = LegacyNetBufferPool.RequestBuffer(data, offset, size);
 +			this._connection.GetStream().BeginWrite(array, 0, size, new AsyncCallback(this.SendCallback), new object[]
 +			{
 +				new Tuple<SocketSendCallback, object>(callback, state),
 +				array
 +			});
-+#endif
++			}
  		}
  
  		void ISocket.AsyncReceive(byte[] data, int offset, int size, SocketReceiveCallback callback, object state)

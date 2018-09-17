@@ -15,15 +15,12 @@
  			}
  			SocialAPI._mode = mode.Value;
  			SocialAPI._modules = new List<ISocialModule>();
-@@ -60,7 +_,11 @@
+@@ -60,7 +_,7 @@
  
  		private static T LoadModule<T>() where T : ISocialModule, new()
  		{
-+#if MAC
-+			T t = Activator.CreateInstance<T>();
-+#else
- 			T t = (default(T) == null) ? Activator.CreateInstance<T>() : default(T);
-+#endif
+-			T t = (default(T) == null) ? Activator.CreateInstance<T>() : default(T);
++			T t = (Utilities.PlatformUtilities.IsOSX||default(T) == null) ? Activator.CreateInstance<T>() : default(T);
  			SocialAPI._modules.Add(t);
  			return t;
  		}

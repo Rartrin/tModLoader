@@ -1,31 +1,28 @@
 --- src/Terraria\Terraria\Netplay.cs
 +++ src/tModLoader\Terraria\Netplay.cs
-@@ -1,5 +_,7 @@
+@@ -1,9 +_,12 @@
  using System;
 +using System.Collections.Concurrent;
  using System.IO;
 +using System.Linq;
  using System.Net;
  using System.Net.Sockets;
- 
-@@ -7,6 +_,7 @@
  using System.Runtime.CompilerServices;
- #endif
  using System.Threading;
 +using System.Threading.Tasks;
  using Terraria.IO;
  using Terraria.Localization;
  using Terraria.Net;
-@@ -17,7 +_,7 @@
- #if !WINDOWS
+@@ -12,7 +_,7 @@
+ using Terraria.Utilities;
  using Terraria.Social.Base;
- #endif
+ 
 -#if SERVER
 +#if SERVER && WINDOWS
  using NATUPNPLib;
  #endif
  namespace Terraria
-@@ -41,7 +_,7 @@
+@@ -36,7 +_,7 @@
  		public static bool spamCheck = false;
  		public static bool anyClients = false;
  		private static Thread ServerThread;
@@ -34,7 +31,7 @@
  		public static UPnPNAT upnpnat;
  		public static IStaticPortMappingCollection mappings;
  #endif
-@@ -51,11 +_,27 @@
+@@ -46,11 +_,27 @@
  
  		public static event Action OnDisconnect;
  
@@ -63,7 +60,7 @@
  			if (Netplay.upnpnat == null)
  			{
  				Netplay.upnpnat = (UPnPNAT)Activator.CreateInstance(Type.GetTypeFromCLSID(new Guid("AE1E00AA-3FD5-403C-8A27-2BBDC30CD0E1")));
-@@ -81,7 +_,7 @@
+@@ -76,7 +_,7 @@
  
  		public static void closePort()
  		{
@@ -72,7 +69,7 @@
  			if (Netplay.portForwardOpen)
  			{
  				Netplay.mappings.Remove(Netplay.portForwardPort, "TCP");
-@@ -264,9 +_,11 @@
+@@ -260,9 +_,11 @@
  			}
  			Netplay.disconnect = false;
  			Netplay.Connection = new RemoteServer();
@@ -87,7 +84,7 @@
  		private static void InnerClientLoop()
  		{
  			try
-@@ -279,7 +_,7 @@
+@@ -275,7 +_,7 @@
  					{
  						if (NetMessage.buffer[256].checkBytes)
  						{
@@ -96,7 +93,7 @@
  						}
  						Netplay.Connection.IsActive = true;
  						if (Netplay.Connection.State == 0)
-@@ -332,6 +_,7 @@
+@@ -328,6 +_,7 @@
  						{
  							Netplay.Connection.State = 6;
  							Main.player[Main.myPlayer].FindSpawn();
@@ -104,7 +101,7 @@
  							NetMessage.SendData(8, -1, -1, null, Main.player[Main.myPlayer].SpawnX, (float)Main.player[Main.myPlayer].SpawnY, 0f, 0f, 0, 0, 0);
  						}
  						if (Netplay.Connection.State == 6 && num != Netplay.Connection.State)
-@@ -363,7 +_,6 @@
+@@ -359,7 +_,6 @@
  									});
  							}
  						}
@@ -112,7 +109,7 @@
  					}
  					else if (Netplay.Connection.IsActive)
  					{
-@@ -372,6 +_,7 @@
+@@ -368,6 +_,7 @@
  					}
  					num = Netplay.Connection.State;
  				}
@@ -120,7 +117,7 @@
  				try
  				{
  					Netplay.Connection.Socket.Close();
-@@ -443,7 +_,7 @@
+@@ -439,7 +_,7 @@
  			{
  				Netplay.Clients[num].Reset();
  				Netplay.Clients[num].Socket = client;
@@ -129,7 +126,7 @@
  			}
  			if (Netplay.FindNextOpenClientSlot() == -1)
  			{
-@@ -550,18 +_,26 @@
+@@ -546,18 +_,26 @@
  				}
  				IL_156:
  				int num3 = 0;
