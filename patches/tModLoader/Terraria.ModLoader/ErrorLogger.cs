@@ -39,11 +39,11 @@ namespace Terraria.ModLoader
 			Interface.errorMessage.SetFile(CompileErrorPath);
 		}
 
-		internal static void LogCompileErrors(CompilerErrorCollection errors, bool forWindows)
+		internal static void LogCompileErrors(CompilerErrorCollection errors, bool forXNA)
 		{
 			string errorHeader = Language.GetTextValue("tModLoader.BuildErrorCompilingError") + Environment.NewLine + Environment.NewLine;
 			string badInstallHint = "";
-			if (!forWindows && ModLoader.windows)
+			if (!forXNA && ModLoader.xna)
 			{
 				badInstallHint = Language.GetTextValue("tModLoader.BuildErrorModCompileFolderHint") + Environment.NewLine + Environment.NewLine;
 			}

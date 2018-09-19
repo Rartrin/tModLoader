@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Terraria.ModLoader.Audio;
+using Terraria.Utilities;
 
 namespace Terraria.ModLoader
 {
@@ -34,21 +35,11 @@ namespace Terraria.ModLoader
 		public static readonly string versionedName = "tModLoader v" + version + " - BetaNameHere Beta 1";
 		public static readonly bool beta = true;
 #endif
-#if WINDOWS
-		public static readonly bool windows = true;
-#else
-		public static readonly bool windows = false;
-#endif
-#if LINUX
-		public static readonly bool linux = true;
-#else
-		public static readonly bool linux = false;
-#endif
-#if MAC
-		public static readonly bool mac = true;
-#else
-		public static readonly bool mac = false;
-#endif
+		public static readonly bool windows = PlatformUtilities.IsWindows;
+		public static readonly bool linux = PlatformUtilities.IsLinux;
+		public static readonly bool mac = PlatformUtilities.IsOSX;
+		public static readonly bool xna =PlatformUtilities.IsXNA;
+
 #if GOG
 		public static readonly bool gog = true;
 #else
