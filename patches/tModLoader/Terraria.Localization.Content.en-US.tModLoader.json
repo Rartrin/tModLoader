@@ -66,13 +66,14 @@
 		"LoadErrorTextureFailedToLoad": "The texture file at {0} failed to load",
 		"LoadErrorWavSoundFailedToLoad": "The wav sound file at {0} failed to load",
 		"LoadErrorMP3SoundFailedToLoad": "The mp3 sound file at {0} failed to load",
+		"LoadErrorSoundFailedToLoadAudioDeviceHint": "(Try making sure your computer has speakers attached and audio devices enabled)",
 		"LoadErrorFontFailedToLoad": "The font file at {0} failed to load",
 		"LoadErrorEffectFailedToLoad": "The effect file at {0} failed to load",
-		"LoadErrorUnknownXNBFileHint": "Unknown xnb file {path}. Perhaps it should be in Fonts/ or Effects/",
+		"LoadErrorUnknownXNBFileHint": "Unknown xnb file {0}. Perhaps it should be in Fonts/ or Effects/",
 		"LoadErrorCannotLoadCompressedEffects": "Cannot load compressed effects.",
 		"LoadErrorAddItemOnlyInLoad": "AddItem can only be called from Mod.Load or Mod.Autoload",
 		"LoadError2ModItemSameName": "You tried to add 2 ModItems with the same name: {0}. Maybe 2 classes share a classname but in different namespaces while autoloading or you manually called AddItem with 2 items of the same name.",
-		"LoadErrorResourceNotFoundPathHint": "Expected resource not found:\n    {0}\nClosest guess: (Is there a spelling or folder placement error?)\n    {1}",
+		"LoadErrorResourceNotFoundPathHint": "Expected resource not found:\n    {0}\nClosest guess: (Is there a spelling or folder placement error?)\n		{1}",
 		"RuntimeErrorSilentlyCaughtException": "Silently Caught Exception: ",
 		"RuntimeErrorSeeLogsTxtForFullTrace": "(see Logs.txt for full trace)",
 		"OpenLogs": "Open Logs",
@@ -92,11 +93,16 @@
 		"ModPackViewList": "View List",
 		"ModPackEnableThisList": "Enable this List",
 		"ModPackEnableOnlyThisList": "Enable only this List",
+		"ModPackUpdateListWithEnabled": "Update List with Enabled",
 		"ModPackViewModsInModBrowser": "View Mods in Mod Browser",
 		"ModPackModsAvailableStatus": "{0} Total, {1} Enabled, {2} Disabled, {3} Missing",
 		"ModPackModsMissing": "The following mods were not found:\n{0}",
 		"ModPackModsContained": "This list contains the following mods:\n{0}",
 		"ModPackMissing": " - Missing",
+		"ModPackDisabled": " - Disabled",
+		"ModPackLoadingSpecifiedModPack": "Loading specified modpack: {0}",
+		"ModPackDoesNotExist": "Modpack {0} does not exist.",
+		"ModPackMalformed": "The {0} modpack failed to be read properly, it might be malformed. ({1})",
 
 		// ModNet/Multiplayer
 		"MPSyncingMods": "Syncing Mods",
@@ -106,7 +112,7 @@
 		"MPServerModsCantDownloadChangeSettingsHint": "You will need to change your settings or acquire the mods from the server owner.",
 		"MPErrorModHashMismatch": "Hash mismatch",
 		"MPErrorModNotSigned": "Mod was not signed by the Mod Browser",
-		"MPErrorModDownloadError": "An error occured while downloading {0}",
+		"MPErrorModDownloadError": "An error occurred while downloading {0}",
 		"MPPacketTooLarge": "Packet too large {0} > {1}",
 
 		// Mod Browser
@@ -142,6 +148,7 @@
 		"MBFilterModlist": "Modlist",
 		"MBExceededBandwidth": "The Mod Browser server has exceeded its daily bandwidth allotment. Please consult this mod's homepage for an alternate download or try again later.",
 		"MBUnknownMBError": "Unknown Mod Browser Error. Try again later.",
+		"MBNoModsFound": "No mods found",
 		"1SecondAgo": "1 second ago",
 		"XSecondsAgo": "{0} seconds ago",
 		"1MinuteAgo": "1 minute ago",
@@ -164,6 +171,7 @@
 		"MBMyPublishedModsStats": "{0} downloads ({1} latest version)",
 		"EnterSteamID": "Please Enter Your SteamID",
 		"PasteSteamID": "Paste SteamID (ctrl-v)",
+		"MBServerResponse": "The Mod Browser server response:\n\n{0}",
 
 		// TML Options
 		"DownloadFromServersYes": "Download Mods From Servers: On",
@@ -176,6 +184,10 @@
 		"AlwaysLogExceptionsNo": "Always Log Exceptions: Off",
 		"ExperimentalFeaturesYes": "Experimental Features: On",
 		"ExperimentalFeaturesNo": "Experimental Features: Off",
+		"RemoveForcedMinimumZoomYes": "Remove Forced Minimum Zoom: On",
+		"RemoveForcedMinimumZoomNo": "Remove Forced Minimum Zoom: Off",
+		"AllowGreaterResolutionsYes": "Allow Greater Resolutions: On",
+		"AllowGreaterResolutionsNo": "Allow Greater Resolutions: Off",
 		"ClearMBCredentials": "Clear Mod Browser Credentials",
 		"ReloadModsReminder": "You have updated a mod. Remember to reload mods for it to take effect.",
 		"EnableModsReminder": "Your recently downloaded mods are currently disabled. Remember to enable and reload if you intend to use them.",
@@ -204,7 +216,7 @@
 		"MSModSourcesCantHaveSpaces": "(Mod Sources folders can't have spaces)",
 
 		// Extract Mod
-		"ExtractErrorWhileExtractingMod": "An error occured while extracting {0}",
+		"ExtractErrorWhileExtractingMod": "An error occurred while extracting {0}",
 		"ExtractHideCodeMessage": "The modder has chosen to hide the code from tModReader.",
 		"ExtractNoSourceCodeMessage": "The modder has not chosen to include their source code.",
 		"ExtractHideResourcesMessage": "The modder has chosen to hide resources (ie. images) from tModReader.",
@@ -222,17 +234,16 @@
 		"MSCompilingWindows": "Compiling {0} for Windows...",
 		"MSCompilingMono": "Compiling {0} for Mono...",
 		// There should be ModName after ':'
-		"MSBuilding": "Building ",
+		"MSBuilding": "Building: ",
 		"MSFinding": "Finding Mods...",
-		// There should be ModName after ':'
-		"MSIntializing": "Initializing: ",
-		// There should be ModName after ':'
-		"MSLoading": "Loading Mod: ",
+		"MSInstantiating": "Instantiating Mods...",
+		"MSSandboxing": "Sandboxing: {0}",
+		"MSIntializing": "Initializing: {0}",
+		"MSLoading": "Loading: {0}",
 		"MSFinishingResourceLoading": "Finishing Resource Loading",
-		"MSCompatibilizing": "Compatibilizing: {0}",
-		"MSReading": "Reading: {0}",
 		"MSSettingUp": "Setting up...",
 		"MSAddingRecipes": "Adding Recipes...",
+		"AddingModContent": "Adding mod content...",
 
 		// Mod Loader Mod
 		"StartBagTooltip": "Some starting items couldn't fit in your inventory",

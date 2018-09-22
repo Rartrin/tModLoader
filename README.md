@@ -1,5 +1,21 @@
 # tModLoader, a Terraria modding API [![Build Status](https://travis-ci.org/blushiemagic/tModLoader.svg?branch=master)](https://travis-ci.org/blushiemagic/tModLoader) [![Discord](https://discordapp.com/api/guilds/103110554649894912/widget.png?style=shield)](https://discord.me/tmodloader)
 
+## Table of Contents
+- [tModLoader, a Terraria modding API](#tmodloader-a-terraria-modding-api--)
+  - [About](#about)
+  - [Support us](#support-us)
+  - [How to get in touch](#how-to-get-in-touch)
+  - [How-to install or uninstall](#how-to-install-or-uninstall)
+    - [Installation](#installation)
+    - [Uninstallation](#uninstallation)
+    - [HELP! I've lost my Players / Worlds when I installed tModLoader, what do I do?](#help-ive-lost-my-players--worlds-when-i-installed-tmodloader-what-do-i-do)
+  - [Contributing](#contributing)
+    - [Brief introduction](#brief-introduction)
+    - [Getting the tModLoader code for the first time](#getting-the-tmodloader-code-for-the-first-time)
+    - [Keeping your code up-to-date](#keeping-your-code-up-to-date)
+    - [Committing your changes](#committing-your-changes)
+    - [HELP! I accidentally committed on a wrong branch!](#help-i-accidentally-committed-on-a-wrong-branch)
+
 ## About
 
 tModLoader is an API for Terraria that provides a way to create and load mods without having to work with Terraria's source code directly. This means you can easily make mods that are compatible with other mods and save yourself the trouble of having to decompile then recompile Terraria.exe. This also means players can use multiple mods at the same time without having to worry about compatibility issues. Traditionally most mods (standalone mods) that don't a sort of API like tModLoader to handle them, will be incompatible with each other. tModLoader is made to work for Terraria version 1.3 and above. To view _most_ of our releases you can go to the [releases page](https://github.com/blushiemagic/tModLoader/releases) which will include the binaries required to install tModLoader. Certain older releases are not included on this page. (there is no real reason to use them either)
@@ -79,6 +95,7 @@ Before you're about to make a contribution, please check [this article](https://
 ### Getting the tModLoader code for the first time
 ___
 1. Clone this repository
+* (Temporary Extra Step) Download Terraria 1.3.5.2 from steam. [Instructions](https://github.com/blushiemagic/tModLoader/issues/227#issuecomment-324450642)
 2. Open setup.bat in the root folder
     * If setup.bat won't open, you must unblock all the files in the cloned repository
 3. Select your vanilla terraria.exe (must be vanilla) ([img](https://i.imgur.com/MccGyvB.png))
