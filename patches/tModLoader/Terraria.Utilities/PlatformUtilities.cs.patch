@@ -1,0 +1,25 @@
+--- src/Terraria\Terraria.Utilities\PlatformUtilities.cs
++++ src/tModLoader\Terraria.Utilities\PlatformUtilities.cs
+@@ -73,5 +_,21 @@
+ 			int count = ((int)array[33] << 24 | (int)array[34] << 16 | (int)array[35] << 8 | (int)array[36]) + 41 + 57;
+ 			stream.Write(array, 0, count);
+ 		}
++
++		public static string ConvertToPlatformSpecificName(string name)
++		{
++			if(name!="Steamworks.NET"){return name;}
++			if(IsWindows)
++			{
++				if(IntPtr.Size==8)
++				{
++					return name+".Windows64";
++				}
++				return name+".Windows86";
++			}
++			if(IsOSX){return name+".OSX";}
++			if(IsLinux){return name+".Linux";}
++			throw new Exception("Unrecognized supported.");
++		}
+ 	}
+ }
+

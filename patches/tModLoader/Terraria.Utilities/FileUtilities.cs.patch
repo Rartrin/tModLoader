@@ -1,0 +1,12 @@
+--- src/Terraria\Terraria.Utilities\FileUtilities.cs
++++ src/tModLoader\Terraria.Utilities\FileUtilities.cs
+@@ -25,7 +_,7 @@
+ 				SocialAPI.Cloud.Delete(path);
+ 				return;
+ 			}
+-			if (Utilities.PlatformUtilities.IsWindows)
++			if (PlatformUtilities.IsWindows)
+ 				FileOperationAPIWrapper.MoveToRecycleBin(path);
+ 			else
+ 				File.Delete(path);
+

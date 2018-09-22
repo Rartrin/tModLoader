@@ -1,0 +1,24 @@
+--- src/Terraria\Terraria\WindowsLaunch.cs
++++ src/tModLoader\Terraria\WindowsLaunch.cs
+@@ -50,7 +_,19 @@
+ 		{
+ 			AppDomain.CurrentDomain.AssemblyResolve += delegate(object sender, ResolveEventArgs sargs)
+ 			{
+-				string resourceName = new AssemblyName(sargs.Name).Name + ".dll";
++				string name= Utilities.PlatformUtilities.ConvertToPlatformSpecificName(new AssemblyName(sargs.Name).Name);
++				//THIS SHOULDN'T NEED TO BE HERE
++				var assemblies=AppDomain.CurrentDomain.GetAssemblies();
++				foreach(var a in assemblies)
++				{
++					if(a.GetName().Name==name)
++					{
++						return a;
++					}
++				}
++				//THIS SHOULDN'T NEED TO BE HERE
++
++				string resourceName = name + ".dll";
+ 				string text = Array.Find<string>(typeof(Program).Assembly.GetManifestResourceNames(), (string element) => element.EndsWith(resourceName));
+ 				if (text == null)
+ 				{
+

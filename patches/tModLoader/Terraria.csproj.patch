@@ -1,5 +1,31 @@
 --- src/Terraria\Terraria.csproj
 +++ src/tModLoader\Terraria.csproj
+@@ -13,13 +_,15 @@
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsRelease|AnyCPU'">
+     <DebugSymbols>true</DebugSymbols>
+-    <OutputPath>bin\WindowsRelease\</OutputPath>
++    <OutputPath>..\..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Terraria\</OutputPath>
+     <DefineConstants>CLIENT; WINDOWS</DefineConstants>
+     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+     <Optimize>true</Optimize>
+     <DebugType>pdbonly</DebugType>
+     <PlatformTarget>AnyCPU</PlatformTarget>
+     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
++    <DocumentationFile>
++    </DocumentationFile>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsServerRelease|AnyCPU'">
+     <DebugSymbols>true</DebugSymbols>
+@@ -33,7 +_,7 @@
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU'">
+     <DebugSymbols>true</DebugSymbols>
+-    <OutputPath>bin\WindowsDebug\</OutputPath>
++    <OutputPath>.\</OutputPath>
+     <DefineConstants>DEBUG;CLIENT; WINDOWS</DefineConstants>
+     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+     <DebugType>full</DebugType>
 @@ -89,11 +_,15 @@
      <PlatformTarget>AnyCPU</PlatformTarget>
      <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -16,28 +42,37 @@
        </PropertyGroup>
      </When>
      <Otherwise>
-@@ -119,6 +_,12 @@
+@@ -118,23 +_,41 @@
+   <ItemGroup>
      <Reference Include="FNA">
        <HintPath>..\..\references\FNA.dll</HintPath>
-     </Reference>
++      <Private>False</Private>
++    </Reference>
 +    <Reference Include="Mono.Cecil">
 +      <HintPath>..\..\references\Mono.Cecil.dll</HintPath>
++      <Private>False</Private>
 +    </Reference>
 +    <Reference Include="MP3Sharp">
 +      <HintPath>..\..\references\MP3Sharp.dll</HintPath>
-+    </Reference>
++      <Private>False</Private>
+     </Reference>
      <Reference Include="Newtonsoft.Json">
        <HintPath>..\..\references\Newtonsoft.Json.dll</HintPath>
++      <Private>False</Private>
      </Reference>
-@@ -126,15 +_,20 @@
+     <Reference Include="ReLogic">
        <HintPath>..\..\references\ReLogic.dll</HintPath>
++      <Private>False</Private>
++    </Reference>
++    <Reference Include="Steamworks.NET.Windows64">
++      <HintPath>..\..\references\Steamworks.NET.Windows64.dll</HintPath>
++      <Private>False</Private>
      </Reference>
      <Reference Include="System" />
+-    <Reference Include="Steamworks.NET">
+-      <HintPath>..\..\references\Steamworks.NET.dll</HintPath>
+-    </Reference>
 +    <Reference Include="System.XML" />
-     <Reference Include="Steamworks.NET">
-+      <SpecificVersion>False</SpecificVersion>
-       <HintPath>..\..\references\Steamworks.NET.dll</HintPath>
-     </Reference>
      <Reference Include="System.Core" />
      <Reference Include="System.Drawing" />
 -    <Reference Include="Ionic.Zip.CF">
@@ -45,10 +80,12 @@
 +    <Reference Include="Ionic.Zip.Reduced">
 +      <SpecificVersion>False</SpecificVersion>
 +      <HintPath>..\..\references\Ionic.Zip.Reduced.dll</HintPath>
++      <Private>False</Private>
      </Reference>
 -    <Reference Include="System.Windows.Forms" />
 +    <Reference Include="System.Windows.Forms">
 +      <HintPath>..\..\references\System.Windows.Forms.Mono.dll</HintPath>
++      <Private>False</Private>
 +    </Reference>
      <Reference Include="WindowsBase" />
    </ItemGroup>
@@ -246,25 +283,35 @@
      <Compile Include="Terraria\Lang.cs" />
      <Compile Include="Terraria\Lighting.cs" />
      <Compile Include="Terraria\LinuxLaunch.cs" Condition="$(DefineConstants.Contains('LINUX'))" />
-@@ -579,8 +_,10 @@
+@@ -579,8 +_,16 @@
    </ItemGroup>
    <ItemGroup>
      <EmbeddedResource Include="Microsoft.Xna.Framework.RuntimeProfile" />
 -    <None Include="Terraria.Libraries\DotNetZip\Ionic.Zip.CF.dll" />
 -    <None Include="Terraria.Libraries\JSON.NET\Newtonsoft.Json.dll" />
 +    <EmbeddedResource Include="..\..\references\Ionic.Zip.Reduced.dll" />
-+    <EmbeddedResource Include="Terraria.Libraries\JSON.NET\Newtonsoft.Json.dll" />
 +    <EmbeddedResource Include="..\..\references\MP3Sharp.dll" />
 +    <EmbeddedResource Include="..\..\references\Mono.Cecil.dll" />
++    <EmbeddedResource Include="..\..\references\FNA.dll" />
++    <EmbeddedResource Include="..\..\references\ReLogic.dll" />
++    <EmbeddedResource Include="..\..\references\Newtonsoft.Json.dll" />
++    <EmbeddedResource Include="..\..\references\Steamworks.NET.Windows64.dll" />
++    <EmbeddedResource Include="..\..\references\Steamworks.NET.Windows86.dll" />
++    <EmbeddedResource Include="..\..\references\Steamworks.NET.OSX.dll" />
++    <EmbeddedResource Include="..\..\references\Steamworks.NET.Linux.dll" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Game.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Items.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Main.json" />
-@@ -646,6 +_,89 @@
+@@ -646,13 +_,130 @@
      <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.Town.json" />
    </ItemGroup>
    <ItemGroup>
+-    <Content Include="Terraria.Libraries\MojoShader.dll" />
+-    <Content Include="Terraria.Libraries\SDL2.dll" />
+-    <Content Include="Terraria.Libraries\SDL2_image.dll" />
+-    <Content Include="Terraria.Libraries\soft_oal.dll" />
 +    <Content Include="Icon.ico" />
-+    <Content Include="Terraria.Libraries\zlib1.dll" />
++    <Content Include="zlib1.dll" />
 +    <EmbeddedResource Include="Terraria.ModLoader.Default.Patreon\Saethar_Body.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.Default.Patreon\Saethar_Body_Arms.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.Default.Patreon\Saethar_Body_Body.png" />
@@ -342,22 +389,28 @@
 +    <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.tModLoader.json" />
 +  </ItemGroup>
 +  <ItemGroup>
-+    <Content Include="Terraria.Libraries\libjpeg-9.dll" />
-+    <Content Include="Terraria.Libraries\libpng16-16.dll" />
-+    <Content Include="Terraria.Libraries\libtiff-5.dll" />
-+    <Content Include="Terraria.Libraries\libwebp-7.dll" />
-     <Content Include="Terraria.Libraries\MojoShader.dll" />
-     <Content Include="Terraria.Libraries\SDL2.dll" />
-     <Content Include="Terraria.Libraries\SDL2_image.dll" />
-@@ -653,6 +_,34 @@
++    <Content Include="libjpeg-9.dll" />
++    <Content Include="libpng16-16.dll" />
++    <Content Include="libtiff-5.dll" />
++    <Content Include="libwebp-7.dll" />
++    <Content Include="MojoShader.dll" />
++    <Content Include="SDL2.dll" />
++    <Content Include="SDL2_image.dll" />
++    <Content Include="soft_oal.dll" />
++  </ItemGroup>
++  <ItemGroup>
++    <WCFMetadata Include="Connected Services\" />
++  </ItemGroup>
++  <ItemGroup>
++    <Folder Include="Terraria.Libraries\" />
    </ItemGroup>
    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
    <PropertyGroup>
 +    <PostBuildEvent>SET CONFIGNAME=$(ConfigurationName)
 +
-+SET EDITBINOPTS=/largeaddressaware
-+IF NOT %25CONFIGNAME:Debug=%25==%25CONFIGNAME%25 SET EDITBINOPTS=%25EDITBINOPTS%25 /stack:0x800000
-+"$(SolutionDir)"largeaddresstool\editbin %25EDITBINOPTS%25 "$(TargetPath)"
+++SET EDITBINOPTS=/largeaddressaware
+++IF NOT %2525CONFIGNAME:Debug=%2525==%2525CONFIGNAME%2525 SET EDITBINOPTS=%2525EDITBINOPTS%2525 /stack:0x800000
+++"$(SolutionDir)"largeaddresstool\editbin %2525EDITBINOPTS%2525 "$(TargetPath)"
 +
 +SET RELEASEFILE=""
 +
