@@ -238,10 +238,10 @@ namespace Terraria.ModLoader.IO
 			return HasFile("All.dll") ? GetFile("All.dll") : isXNA ? GetFile("Windows.dll") : GetFile("Mono.dll");
 		}
 
-		public byte[] GetMainPDB(bool? xna = null)
+		public byte[] GetMainPDB(bool? windows = null)
 		{
-			bool isXNA = xna.GetValueOrDefault(ModLoader.xna);
-			return HasFile("All.pdb") ? GetFile("All.pdb") : isXNA ? GetFile("Windows.pdb") : GetFile("Mono.pdb");
+			bool isWindows = windows.GetValueOrDefault(ModLoader.windows);
+			return HasFile("All.pdb") ? GetFile("All.pdb") : isWindows ? GetFile("Windows.pdb") : GetFile("Mono.pdb");
 		}
 	}
 }

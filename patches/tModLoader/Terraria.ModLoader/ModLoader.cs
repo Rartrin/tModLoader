@@ -290,28 +290,29 @@ namespace Terraria.ModLoader
 		 * Forwarder, deprecated, methods
 		 * These are methods used likely by many modders, which may need some time to adjust to changes
 		 */
-		[Obsolete("ModLoader.GetFileBytes is deprecated since v0.10.1.4, use ModContent.GetFileBytes instead.", true)]
+		 private const bool DEPRECATED_ERROR=true;
+		[Obsolete("ModLoader.GetFileBytes is deprecated since v0.10.1.4, use ModContent.GetFileBytes instead.", DEPRECATED_ERROR)]
 		public static byte[] GetFileBytes(string name) => ModContent.GetFileBytes(name);
 		
-		[Obsolete("ModLoader.FileExists is deprecated since v0.10.1.4, use ModContent.FileExists instead.", true)]
+		[Obsolete("ModLoader.FileExists is deprecated since v0.10.1.4, use ModContent.FileExists instead.", DEPRECATED_ERROR)]
 		public static bool FileExists(string name) => ModContent.FileExists(name);
 
-		[Obsolete("ModContent.GetTexture is deprecated since v0.10.1.4, use ModContent.GetTexture instead.", true)]
+		[Obsolete("ModContent.GetTexture is deprecated since v0.10.1.4, use ModContent.GetTexture instead.", DEPRECATED_ERROR)]
 		public static Texture2D GetTexture(string name) => ModContent.GetTexture(name);
 
-		[Obsolete("ModLoader.TextureExists is deprecated since v0.10.1.4, use ModContent.TextureExists instead.", true)]
+		[Obsolete("ModLoader.TextureExists is deprecated since v0.10.1.4, use ModContent.TextureExists instead.", DEPRECATED_ERROR)]
 		public static bool TextureExists(string name) => ModContent.TextureExists(name);
 
-		[Obsolete("ModContent.GetSound is deprecated since v0.10.1.4, use ModContent.GetSound instead.", true)]
+		[Obsolete("ModContent.GetSound is deprecated since v0.10.1.4, use ModContent.GetSound instead.", DEPRECATED_ERROR)]
 		public static SoundEffect GetSound(string name) => ModContent.GetSound(name);
 
-		[Obsolete("ModLoader.SoundExists is deprecated since v0.10.1.4, use ModContent.SoundExists instead.", true)]
+		[Obsolete("ModLoader.SoundExists is deprecated since v0.10.1.4, use ModContent.SoundExists instead.", DEPRECATED_ERROR)]
 		public static bool SoundExists(string name) => ModContent.SoundExists(name);
 
-		[Obsolete("ModContent.GetMusic is deprecated since v0.10.1.4, use ModContent.GetMusic instead.", true)]
+		[Obsolete("ModContent.GetMusic is deprecated since v0.10.1.4, use ModContent.GetMusic instead.", DEPRECATED_ERROR)]
 		public static Music GetMusic(string name) => ModContent.GetMusic(name);
 
-		[Obsolete("ModLoader.MusicExists is deprecated since v0.10.1.4, use ModContent.MusicExists instead.", true)]
+		[Obsolete("ModLoader.MusicExists is deprecated since v0.10.1.4, use ModContent.MusicExists instead.", DEPRECATED_ERROR)]
 		public static bool MusicExists(string name) => ModContent.MusicExists(name);
 	}
 }
