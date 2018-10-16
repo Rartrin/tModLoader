@@ -408,7 +408,14 @@ namespace Terraria.ModLoader
 				{
 					if (i < Main.maxMusic)
 					{
-						Main.music[i] = Main.soundBank.GetCue("Music_" + i);
+						if(Main.music[i] is MusicCue)
+						{
+							Main.music[i] = Main.soundBank.GetCue("Music_" + i);
+						}
+						else if(Main.music[i] is MusicRWF)
+						{
+							Main.music[i] = Main.rwfb.GetMusic(i);
+						}
 					}
 					else
 					{

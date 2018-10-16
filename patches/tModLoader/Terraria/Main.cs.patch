@@ -144,11 +144,12 @@
  		private static UIWorldSelect _worldSelectMenu = new UIWorldSelect();
  		public static UIManageControls ManageControlsMenu = new UIManageControls();
  		public static UIAchievementsMenu AchievementsMenu = new UIAchievementsMenu();
-@@ -1058,7 +_,7 @@
+@@ -1058,7 +_,8 @@
  		public static AudioEngine engine;
  		public static SoundBank soundBank;
  		public static WaveBank waveBank;
 -		public static Cue[] music = new Cue[42];
++		public static RWFB rwfb;
 +		public static Music[] music = new Music[42];
  		public static float[] musicFade = new float[42];
  		public static float musicVolume = 0.75f;
@@ -578,6 +579,30 @@
  			TextureManager.Initialize();
  			this.mapSectionTexture = new RenderTarget2D(base.GraphicsDevice, 200, 150);
  			Main.ShaderContentManager = new ContentManager(base.Content.ServiceProvider, base.Content.RootDirectory);
+@@ -8254,10 +_,23 @@
+ 		{
+ 			Main.engine = new AudioEngine("Content" + Path.DirectorySeparatorChar + "TerrariaMusic.xgs");
+ 			Main.soundBank = new SoundBank(Main.engine, "Content" + Path.DirectorySeparatorChar + "Sound Bank.xsb");
++			try{
+ 			Main.waveBank = new WaveBank(Main.engine, "Content" + Path.DirectorySeparatorChar + "Wave Bank.xwb");
+ 			for (int i = 1; i < 42; i++)
+ 			{
+ 				Main.music[i] = Main.soundBank.GetCue("Music_" + i);
++			}
++			}catch(Exception e)
++			{
++				if(PlatformUtilities.IsWindows)
++				{
++					rwfb=RWFB.LoadBank("Content"+Path.DirectorySeparatorChar+"Wave Bank.xwb",Main.maxMusic-1);
++					for(int i = 1; i < Main.maxMusic; i++)
++					{
++						Main.music[i] = rwfb.GetMusic(i);
++					}
++				}
++				else{throw e;}//If it had an exception and it isn't on windows, it isn't a file format problem.
+ 			}
+ 		}
+ 
 @@ -8632,6 +_,8 @@
  					bool flag13 = false;
  					Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
@@ -743,7 +768,7 @@
  						if (m == 28)
  						{
  							if (Main.cloudAlpha > 0f && (double)Main.player[Main.myPlayer].position.Y < Main.worldSurface * 16.0 + (double)(Main.screenHeight / 2) && !Main.player[Main.myPlayer].ZoneSnow)
-@@ -9382,7 +_,11 @@
+@@ -9382,7 +_,13 @@
  								}
  								else if (!Main.music[m].IsPlaying)
  								{
@@ -751,12 +776,14 @@
 +									MusicStreaming streaming = Main.music[m] as MusicStreaming;
 +									if (Main.music[m] is MusicCue)
 +										Main.music[m] = Main.soundBank.GetCue("Music_" + m);
++									else if(Main.music[m] is MusicRWF)
++										Main.music[m] = Main.rwfb.GetMusic(m);
 +									if (streaming != null)
 +										streaming.ResetStreamPosition();
  									Main.music[m].Play();
  									Main.music[m].SetVariable("Volume", Main.musicFade[m] * Main.ambientVolume);
  								}
-@@ -9429,7 +_,11 @@
+@@ -9429,7 +_,13 @@
  						{
  							if (!Main.music[m].IsPlaying)
  							{
@@ -764,6 +791,8 @@
 +								MusicStreaming streaming = Main.music[m] as MusicStreaming;
 +								if (Main.music[m] is MusicCue)
 +									Main.music[m] = Main.soundBank.GetCue("Music_" + m);
++								else if(Main.music[m] is MusicRWF)
++									Main.music[m] = Main.rwfb.GetMusic(m);
 +								if (streaming != null)
 +									streaming.ResetStreamPosition();
  								Main.music[m].Play();

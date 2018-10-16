@@ -89,10 +89,17 @@
      <Compile Include="Terraria.ID\NPCID.cs" />
      <Compile Include="Terraria.ID\PlayerTextureID.cs" />
      <Compile Include="Terraria.ID\PlayerVariantID.cs" />
-@@ -409,6 +_,168 @@
+@@ -409,6 +_,175 @@
      <Compile Include="Terraria.Map\MapHelper.cs" />
      <Compile Include="Terraria.Map\MapTile.cs" />
      <Compile Include="Terraria.Map\WorldMap.cs" />
++    <Compile Include="Terraria.ModLoader.Audio.XWB\FFmpeg.cs" />
++    <Compile Include="Terraria.ModLoader.Audio.XWB\MSADPCMToPCM.cs" />
++    <Compile Include="Terraria.ModLoader.Audio.XWB\ConverterXWB.cs" />
++    <Compile Include="Terraria.ModLoader.Audio\RWFB.cs" />
++    <Compile Include="Terraria.ModLoader.Audio\TagData.cs" />
++    <Compile Include="Terraria.ModLoader.Audio\WMAConverter.cs" />
++    <Compile Include="Terraria.ModLoader.Audio.XWB\XWBFixer.cs" />
 +    <Compile Include="Terraria.ModLoader.Default.Patreon\Dinidini.cs" />
 +    <Compile Include="Terraria.ModLoader.Default.Patreon\KittyKitCatCat.cs" />
 +    <Compile Include="Terraria.ModLoader.Default.Patreon\Orian.cs" />
@@ -285,7 +292,7 @@
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Game.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Items.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Main.json" />
-@@ -646,13 +_,130 @@
+@@ -646,13 +_,131 @@
      <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.Town.json" />
    </ItemGroup>
    <ItemGroup>
@@ -294,6 +301,7 @@
 -    <Content Include="Terraria.Libraries\SDL2_image.dll" />
 -    <Content Include="Terraria.Libraries\soft_oal.dll" />
 +    <Content Include="Icon.ico" />
++    <EmbeddedResource Include="Terraria.ModLoader.Audio.XWB\FFmpeg.exe" />
 +    <Content Include="zlib1.dll" />
 +    <EmbeddedResource Include="Terraria.ModLoader.Default.Patreon\Saethar_Body.png" />
 +    <EmbeddedResource Include="Terraria.ModLoader.Default.Patreon\Saethar_Body_Arms.png" />

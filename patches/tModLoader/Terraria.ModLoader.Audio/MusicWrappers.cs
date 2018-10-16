@@ -39,7 +39,7 @@ namespace Terraria.ModLoader.Audio
 		private const int bufferCountPerSubmit = 3;
 		internal const int DEFAULT_BYTESPERCHUNK = 4096;
 		internal static byte[] buffer = new byte[DEFAULT_BYTESPERCHUNK];
-		internal DynamicSoundEffectInstance instance;
+		private DynamicSoundEffectInstance instance;
 		internal Stream stream;
 		internal long dataStart;
 
@@ -63,9 +63,10 @@ namespace Terraria.ModLoader.Audio
 
 		public override void CheckBuffer()
 		{
+			//This is the issue
 			if (instance.PendingBufferCount < bufferMin && IsPlaying)
 			{
-				SubmitBuffer(bufferCountPerSubmit);
+				SubmitBuffer(buffer.Length/*bufferCountPerSubmit*/);
 			}
 		}
 
@@ -126,6 +127,11 @@ namespace Terraria.ModLoader.Audio
 			stream.Close();
 			stream = null;
 		}
+
+		public void SetupSoundEffectInstance(int sampleRate,int channels)
+		{
+			instance = new DynamicSoundEffectInstance(sampleRate, (AudioChannels)channels);
+		}
 	}
 
 	public class MusicStreamingWAV : MusicStreaming
@@ -142,21 +148,27 @@ namespace Terraria.ModLoader.Audio
 			Setup();
 		}
 
+		public MusicStreamingWAV(byte[] data)
+		{
+			this.stream=new MemoryStream(data);
+			Setup();
+		}
+
 		// Parses the header and sets dataStart and instance
 		private void Setup()
 		{
 			BinaryReader reader = new BinaryReader(stream);
-			int chunkID = reader.ReadInt32();
-			int fileSize = reader.ReadInt32();
-			int riffType = reader.ReadInt32();
-			int fmtID = reader.ReadInt32();
-			int fmtSize = reader.ReadInt32();
-			int fmtCode = reader.ReadInt16();
-			int channels = reader.ReadInt16();
-			int sampleRate = reader.ReadInt32();
-			int fmtAvgBPS = reader.ReadInt32();
-			int fmtBlockAlign = reader.ReadInt16();
-			int bitDepth = reader.ReadInt16();
+			int chunkID			= reader.ReadInt32();
+			int fileSize		= reader.ReadInt32();
+			int riffType		= reader.ReadInt32();
+			int fmtID			= reader.ReadInt32();
+			int fmtSize			= reader.ReadInt32();
+			int fmtCode			= reader.ReadInt16();
+			int channels		= reader.ReadInt16();
+			int sampleRate		= reader.ReadInt32();
+			int fmtAvgBPS		= reader.ReadInt32();
+			int fmtBlockAlign	= reader.ReadInt16();
+			int bitDepth		= reader.ReadInt16();
 
 			if (fmtSize == 18)
 			{
@@ -171,7 +183,7 @@ namespace Terraria.ModLoader.Audio
 			dataStart = reader.BaseStream.Position;
 			stream.Position = dataStart;
 
-			instance = new DynamicSoundEffectInstance(sampleRate, (AudioChannels)channels);
+			SetupSoundEffectInstance(sampleRate,channels);
 		}
 	}
 
@@ -180,7 +192,7 @@ namespace Terraria.ModLoader.Audio
 		public MusicStreamingMP3(byte[] data)
 		{
 			MP3Stream stream = new MP3Stream(new MemoryStream(data));
-			instance = new DynamicSoundEffectInstance(stream.Frequency, (AudioChannels)stream.ChannelCount);
+			SetupSoundEffectInstance(stream.Frequency, stream.ChannelCount);
 			this.stream = stream;
 		}
 	}
