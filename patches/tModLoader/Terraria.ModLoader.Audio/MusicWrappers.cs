@@ -56,8 +56,10 @@ namespace Terraria.ModLoader.Audio
 				case "Volume": instance.Volume = value; return;
 				case "Pitch": instance.Pitch = value; return;
 				case "Pan": instance.Pan = value; return;
+				case "loop": instance.IsLooped = true; return;
 				default: throw new Exception("Invalid field: '" + name + "'");
 			}
+			
 		}
 		public override void Stop(AudioStopOptions options) => instance.Stop();
 
@@ -66,7 +68,7 @@ namespace Terraria.ModLoader.Audio
 			//This is the issue
 			if (instance.PendingBufferCount < bufferMin && IsPlaying)
 			{
-				SubmitBuffer(buffer.Length/*bufferCountPerSubmit*/);
+				SubmitBuffer(buffer.Length);
 			}
 		}
 

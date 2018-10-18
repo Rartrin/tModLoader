@@ -220,10 +220,10 @@ namespace Terraria.ModLoader
 				SetupRecipes();
 				return true;
 			}
-			catch (LoadingException e)
+			catch (LoadingException e) 
 			{
 				ModLoader.DisableMod(e.mod.Name);
-				ErrorLogger.LogLoadingError(e.mod.Name, e.mod.Version, e.InnerException, e is AddRecipesException);
+				ErrorLogger.LogLoadingError(e.mod.Name, e.mod.tModLoaderVersion, e.InnerException, e is AddRecipesException);
 				Main.menuMode = Interface.errorMessageID;
 				return false;
 			}

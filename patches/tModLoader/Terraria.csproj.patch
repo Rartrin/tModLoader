@@ -89,13 +89,14 @@
      <Compile Include="Terraria.ID\NPCID.cs" />
      <Compile Include="Terraria.ID\PlayerTextureID.cs" />
      <Compile Include="Terraria.ID\PlayerVariantID.cs" />
-@@ -409,6 +_,175 @@
+@@ -409,6 +_,176 @@
      <Compile Include="Terraria.Map\MapHelper.cs" />
      <Compile Include="Terraria.Map\MapTile.cs" />
      <Compile Include="Terraria.Map\WorldMap.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio.XWB\FFmpeg.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio.XWB\MSADPCMToPCM.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio.XWB\ConverterXWB.cs" />
++    <Compile Include="Terraria.ModLoader.Audio\WavebankConverter.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio\RWFB.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio\TagData.cs" />
 +    <Compile Include="Terraria.ModLoader.Audio\WMAConverter.cs" />
@@ -292,7 +293,7 @@
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Game.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Items.json" />
      <EmbeddedResource Include="Terraria.Localization.Content.de-DE.Main.json" />
-@@ -646,13 +_,131 @@
+@@ -646,14 +_,132 @@
      <EmbeddedResource Include="Terraria.Localization.Content.zh-Hans.Town.json" />
    </ItemGroup>
    <ItemGroup>
@@ -428,4 +429,5 @@
      <PreBuildEvent>
      </PreBuildEvent>
    </PropertyGroup>
-
+-</Project>
++</Project>

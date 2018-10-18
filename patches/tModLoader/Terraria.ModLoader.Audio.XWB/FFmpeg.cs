@@ -29,15 +29,19 @@ namespace Terraria.ModLoader.Audio.XWB
 {
 	internal static class FFmpeg
 	{
-		private static readonly bool isWindows = Environment.OSVersion.Platform==PlatformID.Win32NT||Environment.OSVersion.Platform==PlatformID.Win32S||Environment.OSVersion.Platform==PlatformID.Win32Windows||Environment.OSVersion.Platform==PlatformID.WinCE||Environment.OSVersion.Platform==PlatformID.Xbox;
-		private static string cmd="FFmpeg";
+		private static readonly int windowsLastIndex = 5;
+		private static readonly bool isWindows = Environment.OSVersion.Platform <= (PlatformID) windowsLastIndex;
+		internal static string cmd="FFmpeg.exe";
 
 		private static string ffmpegExecutable=null;
 		private static string file_xWMA=null;
 		private static string file_WAV=null;
 
+
 		internal static void SetupFfmpegEXE()
 		{
+			string _path = Environment.CurrentDirectory + "\\Content\\";
+			//Directory.CreateDirectory(_path);
 			// Non-windows users will have to install ffmpeg 
 			if (isWindows)
 			{
@@ -48,7 +52,7 @@ namespace Terraria.ModLoader.Audio.XWB
 						try
 						{
 							// Try to create a temporary file for the executable
-							ffmpegExecutable = Path.Combine(Path.GetTempPath(),"FFmpeg.exe");
+							ffmpegExecutable = Path.Combine(_path, "FFmpeg.exe");
 							using(Stream stream=File.OpenWrite(ffmpegExecutable))
 							{
 								ffmpegExecutableResource.CopyTo(stream);
@@ -57,7 +61,7 @@ namespace Terraria.ModLoader.Audio.XWB
 						catch(UnauthorizedAccessException)
 						{
 							// Dump the executable in the local directory instead
-							ffmpegExecutable = Path.Combine(Directory.GetCurrentDirectory(),"FFmpeg.exe");
+							ffmpegExecutable = Path.Combine(_path,"FFmpeg.exe");
 							using(Stream stream=File.OpenWrite(ffmpegExecutable))
 							{
 								ffmpegExecutableResource.CopyTo(stream);
@@ -72,8 +76,8 @@ namespace Terraria.ModLoader.Audio.XWB
 					// We can still try, the user might have ffmpeg installed
 				}
 			}
-			file_xWMA=Path.Combine(Path.GetTempPath(),"temp_input.xwma");
-			file_WAV=Path.Combine(Path.GetTempPath(),"temp_output.wav");
+			file_xWMA=Path.Combine(_path, "temp_input.xwma");
+			file_WAV=Path.Combine(_path, "temp_output.wav");
 		}
 
 		internal static void DeleteFFmpegExe()
@@ -107,23 +111,41 @@ namespace Terraria.ModLoader.Audio.XWB
 			 * is that the original weighted about 27 megabytes, whereas the new
 			 * one weights only 1,5 megabytes.
 			 */
-			ProcessStartInfo command = new ProcessStartInfo(cmd);
-			command.Arguments+="-i "+NormalizePath(inputFile)+" ";
-			command.Arguments+="-acodec pcm_s16le ";
-			command.Arguments+="-nostdin ";
-			command.Arguments+="-ab 128k "+NormalizePath(outputFile);
-			
+
 			try
 			{
-				Process process = Process.Start(command);//builder.start();
-				if (!process.WaitForExit(1000))
+				using (Process process = new Process())
 				{
-					Console.Error.WriteLine("Ffmpeg exited with abnormal exit code: " + process.ExitCode);
+					process.StartInfo.Arguments = @"ffmpeg.exe";
+					process.StartInfo.FileName = NormalizePath(cmd);
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+					process.StartInfo.ErrorDialog = true;
+					process.StartInfo.WorkingDirectory = Environment.CurrentDirectory + "\\Content\\";
+					process.StartInfo.RedirectStandardOutput = true;
+					process.StartInfo.RedirectStandardInput = true;
+					process.StartInfo.RedirectStandardError = true;
+					process.StartInfo.UseShellExecute = false;
+					process.StartInfo.CreateNoWindow = true;
+					process.Start();
+					process.EnableRaisingEvents = true;
+					string o = process.StandardError.ReadToEnd();
+					if (!process.WaitForExit(1000))
+					{
+						Console.Error.WriteLine("Ffmpeg exited with abnormal exit code: " + process.ExitCode);
+					}
+					Console.Error.WriteLine(o);
+					Console.Error.WriteLine(process.ExitCode);
 				}
+
+				//Process.Start(command).WaitForExit(1000);//builder.start();
+				//process.WaitForExit();
+				
+				
 			}
 			catch (Exception ex)
 			{
 				Console.Error.WriteLine("An error occured when executing FFmpeg", ex);
+				Console.Error.WriteLine(ex.Message, ex);
 			}
 		}
 
