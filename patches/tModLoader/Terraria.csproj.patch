@@ -25,15 +25,24 @@
        </PropertyGroup>
      </When>
      <Otherwise>
-@@ -118,23 +_,41 @@
+@@ -118,23 +_,50 @@
    <ItemGroup>
      <Reference Include="FNA">
        <HintPath>..\..\references\FNA.dll</HintPath>
 +      <Private>False</Private>
 +    </Reference>
++    <Reference Include="log4net">
++      <HintPath>..\..\references\log4net.dll</HintPath>
++    </Reference>
 +    <Reference Include="Mono.Cecil">
 +      <HintPath>..\..\references\Mono.Cecil.dll</HintPath>
 +      <Private>False</Private>
++    </Reference>
++    <Reference Include="MonoMod.RuntimeDetour">
++      <HintPath>..\..\references\MonoMod.RuntimeDetour.dll</HintPath>
++    </Reference>
++    <Reference Include="MonoMod.Utils">
++      <HintPath>..\..\references\MonoMod.Utils.dll</HintPath>
 +    </Reference>
 +    <Reference Include="MP3Sharp">
 +      <HintPath>..\..\references\MP3Sharp.dll</HintPath>
@@ -60,12 +69,13 @@
      <Reference Include="System.Drawing" />
 -    <Reference Include="Ionic.Zip.CF">
 -      <HintPath>Terraria.Libraries\DotNetZip\Ionic.Zip.CF.dll</HintPath>
+-    </Reference>
+-    <Reference Include="System.Windows.Forms" />
 +    <Reference Include="Ionic.Zip.Reduced">
 +      <SpecificVersion>False</SpecificVersion>
 +      <HintPath>..\..\references\Ionic.Zip.Reduced.dll</HintPath>
 +      <Private>False</Private>
-     </Reference>
--    <Reference Include="System.Windows.Forms" />
++    </Reference>
 +    <Reference Include="System.Windows.Forms">
 +      <HintPath>..\..\references\System.Windows.Forms.Mono.dll</HintPath>
 +      <Private>False</Private>
@@ -89,7 +99,7 @@
      <Compile Include="Terraria.ID\NPCID.cs" />
      <Compile Include="Terraria.ID\PlayerTextureID.cs" />
      <Compile Include="Terraria.ID\PlayerVariantID.cs" />
-@@ -409,6 +_,176 @@
+@@ -409,6 +_,174 @@
      <Compile Include="Terraria.Map\MapHelper.cs" />
      <Compile Include="Terraria.Map\MapTile.cs" />
      <Compile Include="Terraria.Map\WorldMap.cs" />
@@ -122,10 +132,7 @@
 +    <Compile Include="Terraria.ModLoader.Default\MysteryWorld.cs" />
 +    <Compile Include="Terraria.ModLoader.Default\MysteryPlayer.cs" />
 +    <Compile Include="Terraria.ModLoader.Default\StartBag.cs" />
-+    <Compile Include="Terraria.ModLoader.Exceptions\AddRecipesException.cs" />
 +    <Compile Include="Terraria.ModLoader.Exceptions\CustomModDataException.cs" />
-+    <Compile Include="Terraria.ModLoader.Exceptions\LoadingException.cs" />
-+    <Compile Include="Terraria.ModLoader.Exceptions\ModNameException.cs" />
 +    <Compile Include="Terraria.ModLoader.Exceptions\MissingResourceException.cs" />
 +    <Compile Include="Terraria.ModLoader.Exceptions\ModSortingException.cs" />
 +    <Compile Include="Terraria.ModLoader.Exceptions\OldHookException.cs" />
@@ -149,8 +156,8 @@
 +    <Compile Include="Terraria.ModLoader.IO\TagIO.cs" />
 +    <Compile Include="Terraria.ModLoader.UI.Elements\FixedUIScrollbar.cs" />
 +    <Compile Include="Terraria.ModLoader.UI.Elements\UIGrid.cs" />
++    <Compile Include="Terraria.ModLoader.UI\UIAutoScaleTextTextPanel.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UIBuildMod.cs" />
-+    <Compile Include="Terraria.ModLoader.UI\UIColorTextPanel.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UICommon.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UIDownloadMods.cs" />
 +    <Compile Include="Terraria.ModLoader.UI\UIEnterPassphraseMenu.cs" />
@@ -203,6 +210,7 @@
 +    <Compile Include="Terraria.ModLoader\Interface.cs" />
 +    <Compile Include="Terraria.ModLoader\ItemLoader.cs" />
 +    <Compile Include="Terraria.ModLoader\LocalMod.cs" />
++    <Compile Include="Terraria.ModLoader\Logging.cs" />
 +    <Compile Include="Terraria.ModLoader\MapEntry.cs" />
 +    <Compile Include="Terraria.ModLoader\MapLegend.cs" />
 +    <Compile Include="Terraria.ModLoader\MapLoader.cs" />
