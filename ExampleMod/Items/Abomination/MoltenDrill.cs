@@ -1,19 +1,18 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace ExampleMod.Items.Abomination
 {
 	//ported from my tAPI mod because I don't want to make more artwork
 	public class MoltenDrill : ModItem
 	{
-		public override void SetStaticDefaults()
-		{
+		public override void SetStaticDefaults() {
 			Tooltip.SetDefault("Can mine Lihzahrd Bricks");
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			item.damage = 40;
 			item.melee = true;
 			item.width = 20;
@@ -31,7 +30,7 @@ namespace ExampleMod.Items.Abomination
 			item.rare = 9;
 			item.UseSound = SoundID.Item23;
 			item.autoReuse = true;
-			item.shoot = mod.ProjectileType("MoltenDrill");
+			item.shoot = ProjectileType<Projectiles.MoltenDrill>();
 			item.shootSpeed = 40f;
 		}
 	}

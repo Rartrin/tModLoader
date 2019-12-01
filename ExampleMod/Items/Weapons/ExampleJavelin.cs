@@ -2,13 +2,13 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace ExampleMod.Items.Weapons
 {
 	public class ExampleJavelin : ModItem
 	{
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			// Alter any of these values as you see fit, but you should probably keep useStyle on 1, as well as the noUseGraphic and noMelee bools
 			item.shootSpeed = 10f;
 			item.damage = 45;
@@ -29,7 +29,9 @@ namespace ExampleMod.Items.Weapons
 
 			item.UseSound = SoundID.Item1;
 			item.value = Item.sellPrice(silver: 5);
-			item.shoot = mod.ProjectileType<ExampleJavelinProjectile>();
+			// Look at the javelin projectile for a lot of custom code
+			// If you are in an editor like Visual Studio, you can hold CTRL and Click ExampleJavelinProjectile
+			item.shoot = ProjectileType<ExampleJavelinProjectile>();
 		}
 	}
 }

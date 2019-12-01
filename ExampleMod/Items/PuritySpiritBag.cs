@@ -1,19 +1,20 @@
+using ExampleMod.Items.Armor;
+using ExampleMod.NPCs.PuritySpirit;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace ExampleMod.Items
 {
 	public class PuritySpiritBag : ModItem
 	{
-		public override void SetStaticDefaults()
-		{
+		public override void SetStaticDefaults() {
 			DisplayName.SetDefault("Treasure Bag");
 			Tooltip.SetDefault("{$CommonItemTooltip.RightClickToOpen}");
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			item.maxStack = 999;
 			item.consumable = true;
 			item.width = 24;
@@ -22,34 +23,26 @@ namespace ExampleMod.Items
 			item.expert = true;
 		}
 
-		public override bool CanRightClick()
-		{
+		public override bool CanRightClick() {
 			return true;
 		}
 
-		public override void OpenBossBag(Player player)
-		{
+		public override void OpenBossBag(Player player) {
 			player.TryGettingDevArmor();
 			player.TryGettingDevArmor();
 			int choice = Main.rand.Next(7);
-			if (choice == 0)
-			{
-				player.QuickSpawnItem(mod.ItemType("PuritySpiritMask"));
+			if (choice == 0) {
+				player.QuickSpawnItem(ItemType<PuritySpiritMask>());
 			}
-			else if (choice == 1)
-			{
-				player.QuickSpawnItem(mod.ItemType("BunnyMask"));
+			else if (choice == 1) {
+				player.QuickSpawnItem(ItemType<BunnyMask>());
 			}
-			if (choice != 1)
-			{
+			if (choice != 1) {
 				player.QuickSpawnItem(ItemID.Bunny);
 			}
-			player.QuickSpawnItem(mod.ItemType("PurityShield"));
+			player.QuickSpawnItem(ItemType<PurityShield>());
 		}
 
-		public override int BossBagNPC
-		{
-			get { return mod.NPCType("PuritySpirit"); }
-		}
+		public override int BossBagNPC => NPCType<PuritySpirit>();
 	}
 }

@@ -1,191 +1,199 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
+using Terraria.ModLoader.Core;
 using Terraria.UI;
 using Terraria.UI.Gamepad;
-using Terraria.ModLoader.IO;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria.Localization;
 
 namespace Terraria.ModLoader.UI
 {
 	internal class UIModSources : UIState
 	{
-		private UIList modList;
-		private readonly List<UIModSourceItem> items = new List<UIModSourceItem>();
-		private bool updateNeeded;
-		private UIElement uIElement;
-		private UIPanel uIPanel;
-		private UILoaderAnimatedImage uiLoader;
+		private readonly List<UIModSourceItem> _items = new List<UIModSourceItem>();
+		private UIList _modList;
+		private bool _updateNeeded;
+		private UIElement _uIElement;
+		private UIPanel _uIPanel;
+		private UILoaderAnimatedImage _uiLoader;
+		private CancellationTokenSource _cts;
 
-		public override void OnInitialize()
-		{
-			uIElement = new UIElement();
-			uIElement.Width.Set(0f, 0.8f);
-			uIElement.MaxWidth.Set(600f, 0f);
-			uIElement.Top.Set(220f, 0f);
-			uIElement.Height.Set(-220f, 1f);
-			uIElement.HAlign = 0.5f;
+		public override void OnInitialize() {
+			_uIElement = new UIElement {
+				Width = { Percent = 0.8f },
+				MaxWidth = UICommon.MaxPanelWidth,
+				Top = { Pixels = 220 },
+				Height = { Pixels = -220, Percent = 1f },
+				HAlign = 0.5f
+			};
 
-			uIPanel = new UIPanel();
-			uIPanel.Width.Set(0f, 1f);
-			uIPanel.Height.Set(-110f, 1f);
-			uIPanel.BackgroundColor = new Color(33, 43, 79) * 0.8f;
-			uIElement.Append(uIPanel);
+			_uIPanel = new UIPanel {
+				Width = { Percent = 1f },
+				Height = { Pixels = -110, Percent = 1f },
+				BackgroundColor = UICommon.MainPanelBackground
+			};
+			_uIElement.Append(_uIPanel);
 
-			uiLoader = new UILoaderAnimatedImage(0.5f, 0.5f, 1f);
+			_uiLoader = new UILoaderAnimatedImage(0.5f, 0.5f, 1f);
 
-			modList = new UIList();
-			modList.Width.Set(-25f, 1f);
-			modList.Height.Set(0f, 1f);
-			modList.ListPadding = 5f;
-			uIPanel.Append(modList);
-			UIScrollbar uIScrollbar = new UIScrollbar();
-			uIScrollbar.SetView(100f, 1000f);
-			uIScrollbar.Height.Set(0f, 1f);
-			uIScrollbar.HAlign = 1f;
-			uIPanel.Append(uIScrollbar);
-			modList.SetScrollbar(uIScrollbar);
-			UITextPanel<string> uIHeaderTextPanel = new UITextPanel<string>(Language.GetTextValue("tModLoader.MenuModSources"), 0.8f, true);
-			uIHeaderTextPanel.HAlign = 0.5f;
-			uIHeaderTextPanel.Top.Set(-35f, 0f);
-			uIHeaderTextPanel.SetPadding(15f);
-			uIHeaderTextPanel.BackgroundColor = new Color(73, 94, 171);
-			uIElement.Append(uIHeaderTextPanel);
-			UITextPanel<string> buttonBA = new UITextPanel<string>(Language.GetTextValue("tModLoader.MSBuildAll"), 1f, false);
-			buttonBA.Width.Set(-10f, 0.5f);
-			buttonBA.Height.Set(25f, 0f);
-			buttonBA.VAlign = 1f;
-			buttonBA.Top.Set(-65f, 0f);
-			buttonBA.OnMouseOver += UICommon.FadedMouseOver;
-			buttonBA.OnMouseOut += UICommon.FadedMouseOut;
+			_modList = new UIList {
+				Width = { Pixels = -25, Percent = 1f },
+				Height = { Percent = 1f },
+				ListPadding = 5f
+			};
+			_uIPanel.Append(_modList);
+
+			var uIScrollbar = new UIScrollbar {
+				Height = { Percent = 1f },
+				HAlign = 1f
+			}.WithView(100f, 1000f);
+			_uIPanel.Append(uIScrollbar);
+			_modList.SetScrollbar(uIScrollbar);
+
+			var uIHeaderTextPanel = new UITextPanel<string>(Language.GetTextValue("tModLoader.MenuModSources"), 0.8f, true) {
+				HAlign = 0.5f,
+				Top = { Pixels = -35 },
+				BackgroundColor = UICommon.DefaultUIBlue
+			}.WithPadding(15f);
+			_uIElement.Append(uIHeaderTextPanel);
+
+			var buttonBA = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("tModLoader.MSBuildAll")) {
+				Width = { Pixels = -10, Percent = 1f / 3f },
+				Height = { Pixels = 40 },
+				VAlign = 1f,
+				Top = { Pixels = -65 }
+			};
+			buttonBA.WithFadedMouseOver();
 			buttonBA.OnClick += BuildMods;
-			uIElement.Append(buttonBA);
-			UITextPanel<string> buttonBRA = new UITextPanel<string>(Language.GetTextValue("tModLoader.MSBuildReloadAll"), 1f, false);
+			_uIElement.Append(buttonBA);
+
+			var buttonBRA = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("tModLoader.MSBuildReloadAll"));
 			buttonBRA.CopyStyle(buttonBA);
-			buttonBRA.HAlign = 1f;
-			buttonBRA.OnMouseOver += UICommon.FadedMouseOver;
-			buttonBRA.OnMouseOut += UICommon.FadedMouseOut;
+			buttonBRA.HAlign = 0.5f;
+			buttonBRA.WithFadedMouseOver();
 			buttonBRA.OnClick += BuildAndReload;
-			uIElement.Append(buttonBRA);
-			UITextPanel<string> buttonB = new UITextPanel<string>(Language.GetTextValue("UI.Back"), 1f, false);
+			_uIElement.Append(buttonBRA);
+
+			var buttonCreateMod = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("tModLoader.MSCreateMod"));
+			buttonCreateMod.CopyStyle(buttonBA);
+			buttonCreateMod.HAlign = 1f;
+			buttonCreateMod.WithFadedMouseOver();
+			buttonCreateMod.OnClick += ButtonCreateMod_OnClick;
+			_uIElement.Append(buttonCreateMod);
+
+			var buttonB = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("UI.Back"));
 			buttonB.CopyStyle(buttonBA);
-			buttonB.Width.Set(-10f, 1f / 3f);
-			buttonB.Top.Set(-20f, 0f);
-			buttonB.OnMouseOver += UICommon.FadedMouseOver;
-			buttonB.OnMouseOut += UICommon.FadedMouseOut;
+			//buttonB.Width.Set(-10f, 1f / 3f);
+			buttonB.Top.Pixels = -20;
+			buttonB.WithFadedMouseOver();
 			buttonB.OnClick += BackClick;
-			uIElement.Append(buttonB);
-			UITextPanel<string> buttonOS = new UITextPanel<string>(Language.GetTextValue("tModLoader.MSOpenSources"), 1f, false);
+			_uIElement.Append(buttonB);
+
+			var buttonOS = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("tModLoader.MSOpenSources"));
 			buttonOS.CopyStyle(buttonB);
 			buttonOS.HAlign = .5f;
-			buttonOS.OnMouseOver += UICommon.FadedMouseOver;
-			buttonOS.OnMouseOut += UICommon.FadedMouseOut;
+			buttonOS.WithFadedMouseOver();
 			buttonOS.OnClick += OpenSources;
-			uIElement.Append(buttonOS);
-			UITextPanel<string> buttonMP = new UITextPanel<string>(Language.GetTextValue("tModLoader.MSManagePublished"), 1f, false);
+			_uIElement.Append(buttonOS);
+
+			var buttonMP = new UIAutoScaleTextTextPanel<string>(Language.GetTextValue("tModLoader.MSManagePublished"));
 			buttonMP.CopyStyle(buttonB);
 			buttonMP.HAlign = 1f;
-			buttonMP.OnMouseOver += UICommon.FadedMouseOver;
-			buttonMP.OnMouseOut += UICommon.FadedMouseOut;
+			buttonMP.WithFadedMouseOver();
 			buttonMP.OnClick += ManagePublished;
-			uIElement.Append(buttonMP);
-			base.Append(uIElement);
+			_uIElement.Append(buttonMP);
+			Append(_uIElement);
 		}
 
-		private void ManagePublished(UIMouseEvent evt, UIElement listeningElement)
-		{
+		private void ButtonCreateMod_OnClick(UIMouseEvent evt, UIElement listeningElement) {
+			Main.PlaySound(11);
+			Main.menuMode = Interface.createModID;
+		}
+
+		private void ManagePublished(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(11, -1, -1, 1);
 			Main.menuMode = Interface.managePublishedID;
+			if (ModLoader.modBrowserPassphrase == string.Empty) {
+				Main.menuMode = Interface.enterPassphraseMenuID;
+				Interface.enterPassphraseMenu.SetGotoMenu(Interface.managePublishedID);
+			}
 		}
 
-		private void BackClick(UIMouseEvent evt, UIElement listeningElement)
-		{
+		private void BackClick(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(11, -1, -1, 1);
 			Main.menuMode = 0;
 		}
 
-		private void OpenSources(UIMouseEvent evt, UIElement listeningElement)
-		{
+		private void OpenSources(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(10, -1, -1, 1);
-			Directory.CreateDirectory(ModLoader.ModSourcePath);
-			Process.Start(ModLoader.ModSourcePath);
+			Directory.CreateDirectory(ModCompile.ModSourcePath);
+			Process.Start(ModCompile.ModSourcePath);
 		}
 
-		private void BuildMods(UIMouseEvent evt, UIElement listeningElement)
-		{
+		private void BuildMods(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(10, -1, -1, 1);
-			if (modList.Count > 0)
-			{
-				ModLoader.reloadAfterBuild = false;
-				ModLoader.buildAll = true;
-				Main.menuMode = Interface.buildAllModsID;
-			}
+			if (_modList.Count > 0)
+				Interface.buildMod.BuildAll(false);
 		}
 
-		private void BuildAndReload(UIMouseEvent evt, UIElement listeningElement)
-		{
+		private void BuildAndReload(UIMouseEvent evt, UIElement listeningElement) {
 			Main.PlaySound(10, -1, -1, 1);
-			if (modList.Count > 0)
-			{
-				ModLoader.reloadAfterBuild = true;
-				ModLoader.buildAll = true;
-				Main.menuMode = Interface.buildAllModsID;
-			}
+			if (_modList.Count > 0)
+				Interface.buildMod.BuildAll(true);
 		}
 
-		public override void Draw(SpriteBatch spriteBatch)
-		{
+		public override void Draw(SpriteBatch spriteBatch) {
 			base.Draw(spriteBatch);
 			UILinkPointNavigator.Shortcuts.BackButtonCommand = 1;
 		}
 
-		public override void OnActivate()
-		{
-			uIPanel.Append(uiLoader);
-			modList.Clear();
-			items.Clear();
+		public override void OnActivate() {
+			_cts = new CancellationTokenSource();
+			ModCompile.UpdateReferencesFolder();
+			_uIPanel.Append(_uiLoader);
+			_modList.Clear();
+			_items.Clear();
 			Populate();
 		}
 
-		internal void Populate()
-		{
-			if (SynchronizationContext.Current == null)
-				SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-			Task.Factory.StartNew(
-				delegate
-				{
-					var modSources = ModLoader.FindModSources();
-					var modFiles = ModOrganizer.FindMods();
-					return Tuple.Create(modSources, modFiles);
-				})
-				.ContinueWith(task =>
-				{
-					var modSources = task.Result.Item1;
-					var modFiles = task.Result.Item2;
-					foreach (string sourcePath in modSources)
-					{
-						var builtMod = modFiles.SingleOrDefault(m => m.Name == Path.GetFileName(sourcePath));
-						items.Add(new UIModSourceItem(sourcePath, builtMod));
-					}
-					updateNeeded = true;
-				}, TaskScheduler.FromCurrentSynchronizationContext());
+		public override void OnDeactivate() {
+			_cts?.Cancel(false);
+			_cts?.Dispose();
+			_cts = null;
 		}
 
-		public override void Update(GameTime gameTime)
-		{
+		internal void Populate() {
+			Task.Factory.StartNew(
+				delegate {
+					var modSources = ModCompile.FindModSources();
+					var modFiles = ModOrganizer.FindMods();
+					return Tuple.Create(modSources, modFiles);
+				}, _cts.Token)
+				.ContinueWith(task => {
+					var modSources = task.Result.Item1;
+					var modFiles = task.Result.Item2;
+					foreach (string sourcePath in modSources) {
+						var builtMod = modFiles.SingleOrDefault(m => m.Name == Path.GetFileName(sourcePath));
+						_items.Add(new UIModSourceItem(sourcePath, builtMod));
+					}
+					_updateNeeded = true;
+				}, _cts.Token, TaskContinuationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+		}
+
+		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
-			if (!updateNeeded) return;
-			updateNeeded = false;
-			uIPanel.RemoveChild(uiLoader);
-			modList.Clear();
-			modList.AddRange(items);
+			if (!_updateNeeded) return;
+			_updateNeeded = false;
+			_uIPanel.RemoveChild(_uiLoader);
+			_modList.Clear();
+			_modList.AddRange(_items);
 		}
 	}
 }

@@ -1,11 +1,12 @@
+using ExampleMod.Tiles;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace ExampleMod.Items.Placeable
 {
 	public class BunnyTrophy : ModItem
 	{
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			item.width = 30;
 			item.height = 30;
 			item.maxStack = 99;
@@ -17,7 +18,7 @@ namespace ExampleMod.Items.Placeable
 			item.consumable = true;
 			item.value = 50000;
 			item.rare = 1;
-			item.createTile = mod.TileType("BossTrophy");
+			item.createTile = TileType<BossTrophy>();
 			item.placeStyle = 2;
 		}
 	}

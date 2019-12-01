@@ -7,61 +7,46 @@ namespace Terraria.ModLoader.UI
 {
 	internal class UIInputTextField : UIElement
 	{
-		private string hintText;
-		internal string currentString = "";
-		private int textBlinkerCount;
-		private int textBlinkerState;
+		private readonly string _hintText;
+		private string _currentString = string.Empty;
+		private int _textBlinkerCount;
 
-		public delegate void EventHandler(Object sender, EventArgs e);
+		public string Text {
+			get => _currentString;
+			set {
+				if (_currentString != value) {
+					_currentString = value;
+					OnTextChange?.Invoke(this, EventArgs.Empty);
+				}
+			}
+		}
 
+		public delegate void EventHandler(object sender, EventArgs e);
 		public event EventHandler OnTextChange;
 
-		public UIInputTextField(string hintText)
-		{
-			this.hintText = hintText;
+		public UIInputTextField(string hintText) {
+			_hintText = hintText;
 		}
 
-		public void SetText(string text)
-		{
-			if (currentString != text)
-			{
-				currentString = text;
-				OnTextChange?.Invoke(this, new EventArgs());
-			}
-		}
-
-		protected override void DrawSelf(SpriteBatch spriteBatch)
-		{
+		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			GameInput.PlayerInput.WritingText = true;
 			Main.instance.HandleIME();
-			string newString = Main.GetInputText(currentString);
-			if (!newString.Equals(currentString))
-			{
-				currentString = newString;
-				OnTextChange(this, new EventArgs());
+			string newString = Main.GetInputText(_currentString);
+			if (newString != _currentString) {
+				_currentString = newString;
+				OnTextChange?.Invoke(this, EventArgs.Empty);
 			}
-			else
-			{
-				currentString = newString;
+			
+			string displayString = _currentString;
+			if (++_textBlinkerCount / 20 % 2 == 0)
+				displayString += "|";
+			
+			CalculatedStyle space = GetDimensions();
+			if (_currentString.Length == 0) {
+				Utils.DrawBorderString(spriteBatch, _hintText, new Vector2(space.X, space.Y), Color.Gray);
 			}
-			if (++textBlinkerCount >= 20)
-			{
-				textBlinkerState = (textBlinkerState + 1) % 2;
-				textBlinkerCount = 0;
-			}
-			string displayString = currentString;
-			if (this.textBlinkerState == 1)
-			{
-				displayString = displayString + "|";
-			}
-			CalculatedStyle space = base.GetDimensions();
-			if (currentString.Length == 0)
-			{
-				Utils.DrawBorderString(spriteBatch, hintText, new Vector2(space.X, space.Y), Color.Gray, 1f);
-			}
-			else
-			{
-				Utils.DrawBorderString(spriteBatch, displayString, new Vector2(space.X, space.Y), Color.White, 1f);
+			else {
+				Utils.DrawBorderString(spriteBatch, displayString, new Vector2(space.X, space.Y), Color.White);
 			}
 		}
 	}
