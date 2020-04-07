@@ -389,6 +389,8 @@ namespace Terraria.ModLoader
 			}
 		}
 
+		// Some mods have expressed concern about read underflow exceptions conflicting with their ModPacket design, they can use reflection to set this bool as a bandaid until they fix their code.
+		internal static bool ReadUnderflowBypass = false; // Remove by 0.11.7
 		internal static void HandleModPacket(BinaryReader reader, int whoAmI, int length) {
 			if (netMods == null) {
 				ReadNetIDs(reader);
@@ -398,10 +400,14 @@ namespace Terraria.ModLoader
 			var id = NetModCount < 256 ? reader.ReadByte() : reader.ReadInt16();
 			int start = (int)reader.BaseStream.Position;
 			int actualLength = length - 1 - (NetModCount < 256 ? 1 : 2);
-			GetMod(id)?.HandlePacket(reader, whoAmI);
-			if (reader.BaseStream.Position - start != actualLength) {
-				throw new IOException($"Read underflow {reader.BaseStream.Position - start} of {actualLength} bytes caused by {GetMod(id).Name} in HandlePacket");
+			try {
+				ReadUnderflowBypass = false;
+				GetMod(id)?.HandlePacket(reader, whoAmI);
+				if (!ReadUnderflowBypass && reader.BaseStream.Position - start != actualLength) {
+					throw new IOException($"Read underflow {reader.BaseStream.Position - start} of {actualLength} bytes caused by {GetMod(id).Name} in HandlePacket");
+				}
 			}
+			catch { }
 
 			if (Main.netMode == 1) {
 				rxMsgType[id]++;

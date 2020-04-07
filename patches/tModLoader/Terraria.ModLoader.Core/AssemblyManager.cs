@@ -112,8 +112,13 @@ namespace Terraria.ModLoader.Core
 
 				try {
 					using (modFile.Open()) {
-						foreach (var dll in properties.dllReferences)
-							LoadAssembly(EncapsulateReferences(modFile.GetBytes("lib/" + dll + ".dll")));
+						const string suffixPlat = PlatformUtilities.IsXNA ? ".XNA.dll" : ".FNA.dll";
+						foreach (var dll in properties.dllReferences) {
+							byte[] dllBytes = modFile.GetBytes("lib/" + dll + suffixPlat) ??
+							                  modFile.GetBytes("lib/" + dll + ".dll");
+
+							LoadAssembly(EncapsulateReferences(dllBytes));
+						}
 
 						if (eacEnabled && HasEaC) //load the unmodified dll and EaC pdb
 							assembly = LoadAssembly(modFile.GetModAssembly(), File.ReadAllBytes(properties.eacPath));
@@ -198,6 +203,14 @@ namespace Terraria.ModLoader.Core
 				bytesLoaded += code.LongLength + (pdb?.LongLength ?? 0);
 				if (pdb != null && FrameworkVersion.Framework == Framework.Mono)
 					MdbManager.RegisterMdb(GetMainModule(asm.GetName()), pdb);
+
+				if (Program.LaunchParameters.ContainsKey("-dumpasm")) {
+					var dumpdir = Path.Combine(Main.SavePath, "asmdump");
+					Directory.CreateDirectory(dumpdir);
+					File.WriteAllBytes(Path.Combine(dumpdir, asm.FullName+".dll"), code);
+					if (pdb != null)
+						File.WriteAllBytes(Path.Combine(dumpdir, asm.FullName+".pdb"), code);
+				}
 
 				return asm;
 			}

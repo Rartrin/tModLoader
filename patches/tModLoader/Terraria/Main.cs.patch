@@ -653,6 +653,23 @@
  			}
  		}
  
+@@ -4375,8 +_,15 @@
+ 		{
+ 			while (!Netplay.disconnect)
+ 			{
++				string text = Console.ReadLine();
++				ExecuteCommand(text, new ConsoleCommandCaller());
++			}
++		}
++
++		public static void ExecuteCommand(string text, CommandCaller commandCaller)
++		{
++			{
+ 				Console.Write(": ");
+-				string text = Console.ReadLine();
+ 				string text2 = text;
+ 				text = text.ToLower();
+ 				try
 @@ -4423,13 +_,23 @@
  								num = text3.Length;
  							}
@@ -674,7 +691,7 @@
 +						foreach (var entry in modHelpList)
 +							Console.WriteLine(entry.Item1 + new string('\t', num2 - entry.Item1.Length / 8) + entry.Item2);
 +					}
-+					else if (CommandManager.HandleCommand(text, new ConsoleCommandCaller())) {}
++					else if (CommandManager.HandleCommand(text, commandCaller)) {}
  					else if (text == Language.GetTextValue("CLI.Settle_Command"))
  					{
  						if (!Liquid.panicMode)
@@ -687,14 +704,21 @@
  					}
  					else
  					{
-@@ -4556,6 +_,7 @@
+@@ -4556,11 +_,12 @@
  							try
  							{
  								Console.Clear();
+-								continue;
 +								Logging.ResetPastExceptions(); // "CLI.Clear_Command" above.
- 								continue;
++								return;
  							}
  							catch
+ 							{
+-								continue;
++								return;
+ 							}
+ 						}
+ 						if (text == Language.GetTextValue("CLI.Playing_Command"))
 @@ -4761,7 +_,7 @@
  			Main.instance = this;
  #if CLIENT
@@ -746,6 +770,18 @@
  		}
  
  		private void ClientInitialize()
+@@ -7445,9 +_,11 @@
+ 			}
+ 			if (Main.autoJoin)
+ 			{
++				ModLoader.ModLoader.OnSuccessfulLoad += () => {
+ 				Main.LoadPlayers();
+ 				Main.menuMode = 1;
+ 				Main.menuMultiplayer = true;
++				};
+ 			}
+ 			Main.fpsTimer.Start();
+ 		}
 @@ -7455,7 +_,8 @@
  		public T OurLoad<T>(string path)
  		{
@@ -1040,18 +1076,21 @@
  				this.DoUpdate(gameTime);
  				CinematicManager.Instance.Update(gameTime);
  				if (Main.netMode == 2)
-@@ -11950,6 +_,11 @@
- 				else if (Main.netMode == 1)
+@@ -11951,8 +_,14 @@
  				{
  					Netplay.Connection.Socket.SendQueuedPackets();
-+				}
+ 				}
 +				}
 +				catch (Exception e)
 +				{
 +					Logging.Terraria.Error(e);
- 				}
++				}
  				this._isDrawingOrUpdating = false;
  			}
++			base.Update(gameTime); //Vanilla bug, moved from DoUpdate. Early returns fail to call base.Update, and prevent streaming audio from playing
+ 		}
+ 
+ 		public void UpdateViewZoomKeys()
 @@ -11997,6 +_,8 @@
  			{
  				Main.InGameUI.Update(gameTime);
@@ -1211,6 +1250,14 @@
  			if (Main.ignoreErrors)
  			{
  				try
+@@ -12937,7 +_,6 @@
+ 					Main.cameraLerp = 1f;
+ 				}
+ 			}
+-			base.Update(gameTime);
+ 		}
+ 
+ 		private static void DoUpdate_AnimateCursorColors()
 @@ -12982,7 +_,7 @@
  
  		private static void DoUpdate_Enter_ToggleChat()
@@ -2544,6 +2591,14 @@
  		}
  
  		private static Microsoft.Xna.Framework.Color buffColor(Microsoft.Xna.Framework.Color newColor, float R, float G, float B, float A)
+@@ -29831,6 +_,7 @@
+ 					{
+ 						this.DrawCacheNPCsBehindNonSolidTiles.Add(i);
+ 					}
++					NPCLoader.DrawBehind(Main.npc[i], i);
+ 				}
+ 			}
+ 		}
 @@ -29885,6 +_,7 @@
  							this.DrawCacheProjsBehindProjectiles.Add(i);
  						}
@@ -5025,7 +5080,7 @@
  						{
  							int num7 = Main.rand.Next(3);
  							Main.soundInstanceDig[num7].Stop();
-@@ -60969,18 +_,60 @@
+@@ -60969,11 +_,35 @@
  							soundEffectInstance.Pan = num3;
  							Main.trackableSoundInstances[num] = soundEffectInstance;
  						}
@@ -5041,10 +5096,12 @@
 +						}
  						if (soundEffectInstance != null)
  						{
- 							soundEffectInstance.Pitch += pitchOffset;
- 							soundEffectInstance.Volume *= volumeScale;
+-							soundEffectInstance.Pitch += pitchOffset;
+-							soundEffectInstance.Volume *= volumeScale;
++							soundEffectInstance.Pitch = Utils.Clamp(soundEffectInstance.Pitch + pitchOffset, -1, 1);
++							soundEffectInstance.Volume = Utils.Clamp(soundEffectInstance.Volume * volumeScale, 0, 1);
  							Main.PlaySoundInstance(soundEffectInstance);
- 						}
++						}
 +						if ((type >= 30 && type <= 35) || type == 39)
 +						{
 +							if (Main.ambientError > 0)
@@ -5058,10 +5115,10 @@
 +							{
 +								Main.soundError--;
 +							}
-+						}
+ 						}
  						result = soundEffectInstance;
  						return result;
- 					}
+@@ -60981,6 +_,24 @@
  				}
  				catch
  				{
