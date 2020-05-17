@@ -23,6 +23,7 @@ namespace Terraria.ModLoader
 	public static class Logging
 	{
 		public static readonly string LogDir = Path.Combine(Program.SavePath, "Logs");
+		public static readonly string LogArchiveDir = Path.Combine(LogDir, "Old");
 		public static string LogPath { get; private set; }
 
 		internal static ILog Terraria { get; } = LogManager.GetLogger("Terraria");
@@ -157,6 +158,7 @@ namespace Terraria.ModLoader
 			"Terraria.Net.Sockets.TcpSocket.Terraria.Net.Sockets.ISocket.AsyncSend", // client disconnects from server
 			"System.Diagnostics.Process.Kill", // attempt to kill non-started process when joining server
 			"Terraria.ModLoader.Core.AssemblyManager.CecilAssemblyResolver.Resolve",
+			"Terraria.ModLoader.Engine.TMLContentManager.OpenStream" // TML content manager delegating to vanilla dir
 		};
 
 		// there are a couple of annoying messages that happen during cancellation of asynchronous downloads

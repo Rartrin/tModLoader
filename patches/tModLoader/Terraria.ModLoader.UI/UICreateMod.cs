@@ -198,12 +198,27 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyName>{modNameTrimmed}</AssemblyName>
     <TargetFramework>net45</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <Target Name=""BuildMod"" AfterTargets=""Build"">
     <Exec Command=""&quot;$(tMLBuildServerPath)&quot; -build $(ProjectDir) -eac $(TargetPath) -define $(DefineConstants) -unsafe $(AllowUnsafeBlocks)"" />
   </Target>
+  <ItemGroup>
+    <PackageReference Include=""tModLoader.CodeAssist"" Version=""0.1.*"" />
+  </ItemGroup>
 </Project>";
+		}
+
+		internal bool CsprojUpdateNeeded(string fileContents)
+		{
+			if (!fileContents.Contains("tModLoader.targets"))
+				return true;
+			if (fileContents.Contains("<LangVersion>latest</LangVersion>"))
+				return true;
+			if (!fileContents.Contains(@"<PackageReference Include=""tModLoader.CodeAssist"" Version=""0.1.*"" />"))
+				return true;
+
+			return false;
 		}
 
 		internal string GetLaunchSettings() {
